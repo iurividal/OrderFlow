@@ -1,0 +1,96 @@
+﻿@page "/pedidos"
+@inject NavigationManager NavigationManager
+
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Pedidos</MudText>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudTextField @bind-Value="searchString" Placeholder="Buscar por cliente..." Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                              Class="mt-0"></MudTextField>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudTable Items="@orders" Filter="@(FilterFunc)" Hover="true" Dense="true" Bordered="true" Striped="true"
+              LoadingProgressColor="Color.Primary">
+        <HeaderContent>
+            <MudTh>Número</MudTh>
+            <MudTh>Nome</MudTh>
+            <MudTh>Valor</MudTh>
+            <MudTh>Data</MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Numero">@context.Numero</MudTd>
+            <MudTd DataLabel="Nome">@context.Cliente.Name</MudTd>
+            <MudTd DataLabel="Valor">@context.ValorTotal</MudTd>
+            <MudTd DataLabel="Data">@context.Data</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                           OnClick="@(() => ViewDetails(context.Numero))">
+                    Detalhes
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 25, 50, 100}"/>
+        </PagerContent>
+    </MudTable>
+
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" Class="floating-button"
+            OnClick="@(() => NavigateToCreate())"/>
+</MudContainer>
+
+<style>
+    .floating-button {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 10;
+    }
+</style>
+
+@code {
+    private string searchString = "";
+    private List<OrderModel> orders = new List<OrderModel>();
+
+    protected override void OnInitialized()
+    {
+        // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
+        orders = new List<OrderModel>
+        {
+            new OrderModel { Cliente = new CustomerModel("João Silva"), Data = DateTime.Now, Numero = "P1231231", ValorTotal = 330.00m },
+            new OrderModel { Cliente = new CustomerModel("Maria Souza"), Data = DateTime.Now, Numero = "P1231232", ValorTotal = 450.00m },
+            new OrderModel { Cliente = new CustomerModel("José Santos"), Data = DateTime.Now, Numero = "P1231233", ValorTotal = 250.00m },
+        };
+    }
+
+    private bool FilterFunc(OrderModel element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.Cliente.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Numero.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    private void ViewDetails(string id)
+    {
+        NavigationManager.NavigateTo($"/order/{id}");
+    }
+
+    private void NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/cadastro-order");
+    }
+
+}

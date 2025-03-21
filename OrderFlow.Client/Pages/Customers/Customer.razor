@@ -1,0 +1,99 @@
+﻿@page "/clientes"
+@using System.Collections.Generic
+@inject NavigationManager NavigationManager
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Clientes</MudText>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudTextField @bind-Value="searchString" Placeholder="Buscar por nome..." Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                              Class="mt-0"></MudTextField>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudTable Items="@clients" Filter="@(FilterFunc)" Hover="true" Dense="true" Bordered="true" Striped="true"
+              LoadingProgressColor="Color.Primary">
+        <HeaderContent>
+            <MudTh>Nome</MudTh>
+            <MudTh>Telefone</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nome">@context.Name</MudTd>
+            <MudTd DataLabel="Telefone">@context.Phone</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                           OnClick="@(() => ViewDetails(context.Id))">
+                    Detalhes
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 25, 50, 100}"/>
+        </PagerContent>
+    </MudTable>
+
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" Class="floating-button"
+            OnClick="@(() => NavigateToCreate())"/>
+</MudContainer>
+
+<style>
+    .floating-button {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 10;
+    }
+</style>
+
+@code {
+    private string searchString = "";
+    private List<CustomerModel> clients = new List<CustomerModel>();
+
+    protected override void OnInitialized()
+    {
+        // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
+        clients = new List<CustomerModel>
+        {
+            new CustomerModel { Name = "João Silva", Email = "joao.silva@email.com", Phone = "(11) 98765-4321" },
+            new CustomerModel { Name = "Maria Oliveira", Email = "maria.oliveira@email.com", Phone = "(11) 91234-5678" },
+            new CustomerModel { Name = "Carlos Santos", Email = "carlos.santos@email.com", Phone = "(21) 99876-5432" },
+            new CustomerModel { Name = "Ana Pereira", Email = "ana.pereira@email.com", Phone = "(31) 97654-3210" },
+            new CustomerModel { Name = "Paulo Costa", Email = "paulo.costa@email.com", Phone = "(41) 95432-1098" },
+        };
+    }
+
+    private bool FilterFunc(CustomerModel element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Phone.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    private void ViewDetails(string id)
+    {
+        NavigationManager.NavigateTo($"/clientes/{id}");
+    }
+
+    private void NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/cadastro-cliente");
+    }
+
+}

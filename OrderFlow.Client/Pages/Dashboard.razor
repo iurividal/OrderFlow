@@ -1,0 +1,366 @@
+﻿@page "/Dashboard"
+
+
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4 mb-8">
+    <MudText Typo="Typo.h4" Class="mb-4">Dashboard</MudText>
+    <MudText Typo="Typo.subtitle1" Color="Color.Secondary" Class="mb-5">Visão geral de vendas e atividades recentes
+    </MudText>
+
+    <!-- Filtros de data -->
+    <MudPaper Elevation="0" Class="d-flex flex-wrap gap-4 mb-6 pa-4 rounded-lg">
+        <MudSelect T="string" Value="@_selectedDateRange" ValueChanged="@(value => _selectedDateRange = value)"
+                   Label="Período" Variant="Variant.Outlined" Dense="true" Style="min-width: 200px;">
+            <MudSelectItem Value="@("hoje")">Hoje</MudSelectItem>
+            <MudSelectItem Value="@("ontem")">Ontem</MudSelectItem>
+            <MudSelectItem Value="@("7dias")">Últimos 7 dias</MudSelectItem>
+            <MudSelectItem Value="@("30dias")">Últimos 30 dias</MudSelectItem>
+            <MudSelectItem Value="@("mes")">Este mês</MudSelectItem>
+            <MudSelectItem Value="@("personalizado")">Período personalizado</MudSelectItem>
+        </MudSelect>
+
+
+        @if (_selectedDateRange == "personalizado")
+        {
+            <MudDateRangePicker Label="Selecione o período" DateRange="_dateRange" DateFormat="dd/MM/yyyy" Class="mt-0"
+                                DisableToolbar="true"
+                                Style="min-width:300px;"/>
+        }
+
+
+        <MudSpacer/>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh"
+                   Size="Size.Small">Atualizar dados
+        </MudButton>
+    </MudPaper>
+
+    <!-- Cards informativos - primeira linha -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.ListAlt" Color="Color.Primary" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Total de Pedidos do Dia</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">47</MudText>
+                            <MudText Typo="Typo.caption"><span style="color: #4CAF50;">↑ 12%</span> desde ontem
+                            </MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Pedidos em Andamento</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">15</MudText>
+                            <MudText Typo="Typo.caption">Tempo médio: <span style="font-weight: 500;">32 min</span>
+                            </MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Pedidos Entregues/Retirados</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">32</MudText>
+                            <MudText Typo="Typo.caption"><span style="color: #4CAF50;">↑ 8%</span> desde ontem</MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.LocalAtm" Color="Color.Primary" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Valor Total Vendido Hoje</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">R$ 3.749,80</MudText>
+                            <MudText Typo="Typo.caption"><span style="color: #4CAF50;">↑ 15%</span> desde ontem
+                            </MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Cards informativos - segunda linha -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Color="Color.Error" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Valor em Aberto</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">R$ 1.250,75</MudText>
+                            <MudText Typo="Typo.caption">Em 8 pedidos pendentes</MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Info" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Clientes Ativos</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">124</MudText>
+                            <MudText Typo="Typo.caption"><span style="color: #4CAF50;">↑ 5%</span> desde a semana
+                                passada
+                            </MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Primary" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Média de Ticket por Pedido</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">R$ 79,78</MudText>
+                            <MudText Typo="Typo.caption"><span style="color: #4CAF50;">↑ 3%</span> desde ontem</MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2" Class="rounded-lg h-100">
+                <MudCardContent>
+                    <div class="d-flex">
+                        <MudIcon Icon="@Icons.Material.Filled.Timer" Color="Color.Secondary" Class="mr-3"
+                                 Style="width: 56px; height: 56px;"/>
+                        <div>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Tempo Médio de Preparo</MudText>
+                            <MudText Typo="Typo.h5" Style="font-weight: 600;">27 min</MudText>
+                            <MudText Typo="Typo.caption"><span style="color: #FF5252;">↑ 2 min</span> desde ontem
+                            </MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Gráficos - primeira linha -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="8">
+            <MudCard Elevation="2" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Evolução das Vendas no Mês</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default"/>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudChart ChartType="ChartType.Line" ChartSeries="@_vendasPorDiaSeries" XAxisLabels="@_diasDoMes"
+                              Width="100%" Height="300px"></MudChart>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+
+    </MudGrid>
+
+    <!-- Gráficos - segunda linha -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="4">
+            <MudCard Elevation="2" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Formas de Pagamento</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default"/>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudChart ChartType="ChartType.Pie"
+                              ChartOptions="new ChartOptions{ ShowToolTips=false, ShowLegendLabels=true }"
+                              InputData="_pagamentosSeriesData" Width="100%"
+                              Height="300px"></MudChart>
+                    <MudGrid Class="mt-2">
+                        <MudItem xs="4">
+                            <div class="d-flex align-center">
+                                <div
+                                    style="width: 12px; height: 12px; background-color: #1E88E5; border-radius: 2px; margin-right: 8px;"></div>
+                                <MudText Typo="Typo.body2">Pix (55%)</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <div class="d-flex align-center">
+                                <div
+                                    style="width: 12px; height: 12px; background-color: #43A047; border-radius: 2px; margin-right: 8px;"></div>
+                                <MudText Typo="Typo.body2">Cartão (35%)</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <div class="d-flex align-center">
+                                <div
+                                    style="width: 12px; height: 12px; background-color: #FB8C00; border-radius: 2px; margin-right: 8px;"></div>
+                                <MudText Typo="Typo.body2">Dinheiro (10%)</MudText>
+                            </div>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="8">
+            <MudCard Elevation="2" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Vendas por Dia da Semana</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default"/>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@_vendasPorDiaSemana" XAxisLabels="@_diasDaSemana"
+                              Width="100%" Height="300px"></MudChart>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Gráficos - terceira linha -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Pedidos por Período do Dia</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default"/>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudChart ChartType="ChartType.Donut" ChartSeries="@_pedidosPorPeriodoSeries" Width="100%"
+                              Height="300px"></MudChart>
+                    <MudGrid Class="mt-2">
+                        <MudItem xs="4">
+                            <div class="d-flex align-center">
+                                <div
+                                    style="width: 12px; height: 12px; background-color: #FFC107; border-radius: 2px; margin-right: 8px;"></div>
+                                <MudText Typo="Typo.body2">Manhã (25%)</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <div class="d-flex align-center">
+                                <div
+                                    style="width: 12px; height: 12px; background-color: #FF5722; border-radius: 2px; margin-right: 8px;"></div>
+                                <MudText Typo="Typo.body2">Tarde (35%)</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <div class="d-flex align-center">
+                                <div
+                                    style="width: 12px; height: 12px; background-color: #673AB7; border-radius: 2px; margin-right: 8px;"></div>
+                                <MudText Typo="Typo.body2">Noite (40%)</MudText>
+                            </div>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Produtos Mais Vendidos</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default"/>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@_produtosMaisVendidosSeries"
+                              XAxisLabels="@_produtosMaisVendidosLabels" Width="100%" Height="300px"></MudChart>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+
+    // Filtros de data
+    private string _selectedDateRange = "hoje";
+    private DateRange _dateRange = new DateRange(DateTime.Now.AddDays(-7), DateTime.Now);
+
+    // Dados para os gráficos
+    private string[] _diasDaSemana = { "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
+    private string[] _diasDoMes = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
+
+    private List<ChartSeries> _vendasPorDiaSeries = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Vendas", Data = new double[] { 2125, 1890, 2350, 2785, 2580, 2430, 2690, 2800, 2950, 3100, 2890, 3200, 3470, 3280, 3050, 3380, 3520, 3750, 3640, 3920 } }
+    };
+
+    private List<ChartSeries> _vendasPorDiaSemana = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Quantidade de Vendas", Data = new double[] { 42, 34, 40, 48, 62, 80, 68 } }
+    };
+
+    private List<ChartSeries> _pedidosPorStatusSeries = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Pendente", Data = new double[] { 8 } },
+        new ChartSeries() { Name = "Em preparo", Data = new double[] { 7 } },
+        new ChartSeries() { Name = "Pronto", Data = new double[] { 9 } },
+        new ChartSeries() { Name = "Finalizado", Data = new double[] { 23 } }
+    };
+
+    private string[] _pagamentosSeriesLabel = new[] { "Pix", "Cartão de Crédito", "Boleto" };
+    private double[] _pagamentosSeriesData = new Double[] { 55, 10, 15 };
+
+    private List<ChartSeries> _pedidosPorPeriodoSeries = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Quantidade", Data = new double[] { 25, 35, 40 } }
+    };
+
+    private string[] _produtosMaisVendidosLabels = { "Produto 1", "Produto 2", "Produto 3", "Produto 4", "Produto 5" };
+
+    private List<ChartSeries> _produtosMaisVendidosSeries = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Quantidade", Data = new double[] { 85, 72, 65, 54, 47 } }
+    };
+
+
+}

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderFlow.Client", "OrderFlow.Client\OrderFlow.Client.csproj", "{BF3438D6-34B5-454B-A8C3-9682D0A4DFA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderFlow.Api", "OrderFlow.Api\OrderFlow.Api.csproj", "{E008C31D-3A20-4B13-B290-DE016C327EF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderFlow.Shared", "OrderFlow.Shared\OrderFlow.Shared.csproj", "{4EBE4967-49DE-497E-8ED3-5F50A92679B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF3438D6-34B5-454B-A8C3-9682D0A4DFA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3438D6-34B5-454B-A8C3-9682D0A4DFA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3438D6-34B5-454B-A8C3-9682D0A4DFA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3438D6-34B5-454B-A8C3-9682D0A4DFA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E008C31D-3A20-4B13-B290-DE016C327EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E008C31D-3A20-4B13-B290-DE016C327EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E008C31D-3A20-4B13-B290-DE016C327EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E008C31D-3A20-4B13-B290-DE016C327EF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EBE4967-49DE-497E-8ED3-5F50A92679B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EBE4967-49DE-497E-8ED3-5F50A92679B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EBE4967-49DE-497E-8ED3-5F50A92679B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EBE4967-49DE-497E-8ED3-5F50A92679B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

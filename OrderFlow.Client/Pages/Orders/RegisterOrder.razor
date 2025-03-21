@@ -1,0 +1,358 @@
+﻿@page "/cadastro-pedido"
+@using System.Collections.Generic
+@using System.Linq
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Cadastro de Pedido</MudText>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudGrid>
+            <MudItem xs="12" md="12">
+                <MudText Typo="Typo.h6" Class="mb-2">Dados do Cliente</MudText>
+                <MudGrid>
+                    <MudItem xs="12" md="12">
+                        <MudTextField @bind-Value="termoBuscaCliente" Label="Pesquisar cliente"
+                                      Variant="Variant.Outlined"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                                      OnAdornmentClick="BuscarCliente"/>
+                    </MudItem>
+                </MudGrid>
+
+                @if (clientesEncontrados.Any())
+                {
+                    <MudTable Items="@clientesEncontrados" Dense="true" Hover="true" Class="mt-2">
+                        <HeaderContent>
+                            <MudTh>Nome</MudTh>
+                            <MudTh>Telefone</MudTh>
+                            <MudTh>CPF/CNPJ</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Nome">@context.Name</MudTd>
+                            <MudTd DataLabel="Telefone">@context.Phone</MudTd>
+                            <MudTd DataLabel="CPF/CNPJ">@context.DocumentId</MudTd>
+                            <MudTd>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                                           OnClick="@(() => SelecionarCliente(context))">Selecionar
+                                </MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+                @if (clienteSelecionado != null)
+                {
+                    <MudPaper Elevation="0" Class="pa-2 mt-2 d-flex align-center mud-background-gray">
+                        <MudText Typo="Typo.body1"><b>Cliente:</b> @clienteSelecionado.Name</MudText>
+                        <MudSpacer/>
+                        <MudText Typo="Typo.body1" Class="mx-2"><b>Tel:</b> @clienteSelecionado.Phone</MudText>
+                        <MudSpacer/>
+                        <MudText Typo="Typo.body1"><b>Doc:</b> @clienteSelecionado.DocumentId</MudText>
+                        <MudSpacer/>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" Size="Size.Small"
+                                       OnClick="@(() => clienteSelecionado = null)"/>
+                    </MudPaper>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6" Class="mb-2">Adicionar Produtos</MudText>
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudSelect T="string" Label="Buscar por" @bind-Value="tipoBuscaProduto">
+                    <MudSelectItem Value="@("codigo")">Código</MudSelectItem>
+                    <MudSelectItem Value="@("nome")">Nome</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="8">
+                <MudTextField @bind-Value="termoBuscaProduto" Label="Pesquisar produto" Variant="Variant.Outlined"
+                              Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                              OnAdornmentClick="BuscarProduto"/>
+            </MudItem>
+        </MudGrid>
+
+        @if (produtosEncontrados.Any())
+        {
+            <MudTable Items="@produtosEncontrados" Dense="true" Hover="true" Class="mt-2">
+                <HeaderContent>
+                    <MudTh>Código</MudTh>
+                    <MudTh>Nome</MudTh>
+                    <MudTh>Preço</MudTh>
+                    <MudTh>Estoque</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Código">@context.Codigo</MudTd>
+                    <MudTd DataLabel="Nome">@context.Nome</MudTd>
+                    <MudTd DataLabel="Preço">@context.Preco.ToString("C")</MudTd>
+                    <MudTd DataLabel="Estoque">@context.Estoque</MudTd>
+                    <MudTd>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                                   OnClick="@(() => SelecionarProduto(context))">Selecionar
+                        </MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+        @if (produtoSelecionado != null)
+        {
+            <MudPaper Elevation="0" Class="pa-2 mt-2 d-flex align-center mud-background-gray">
+                <MudText Typo="Typo.body1"><b>Produto:</b> @produtoSelecionado.Nome</MudText>
+                <MudSpacer/>
+                <MudText Typo="Typo.body1" Class="mx-2"><b>Código:</b> @produtoSelecionado.Codigo</MudText>
+                <MudSpacer/>
+                <MudText Typo="Typo.body1"><b>Preço:</b> @produtoSelecionado.Preco.ToString("C")</MudText>
+                <MudSpacer/>
+                <MudNumericField @bind-Value="quantidadeProduto" Label="Qtd" Min="1" Max="@produtoSelecionado.Estoque"/>
+                <MudSpacer/>
+                <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" Class="ml-2"
+                           OnClick="AdicionarItemAoPedido">Adicionar ao Pedido
+                </MudButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" Size="Size.Small"
+                               OnClick="@(() => produtoSelecionado = null)"/>
+            </MudPaper>
+        }
+    </MudPaper>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6" Class="mb-2">Itens do Pedido</MudText>
+
+        @if (!itensPedido.Any())
+        {
+            <MudAlert Severity="Severity.Info">Nenhum item adicionado ao pedido.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@itensPedido" Hover="true" Class="mb-4">
+                <HeaderContent>
+                    <MudTh>Código</MudTh>
+                    <MudTh>Produto</MudTh>
+                    <MudTh>Preço Unit.</MudTh>
+                    <MudTh>Quantidade</MudTh>
+                    <MudTh>Subtotal</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Código">@context.Produto.Codigo</MudTd>
+                    <MudTd DataLabel="Produto">@context.Produto.Nome</MudTd>
+                    <MudTd DataLabel="Preço Unit.">@context.PrecoUnitario.ToString("C")</MudTd>
+                    <MudTd DataLabel="Quantidade">@context.Quantidade</MudTd>
+                    <MudTd DataLabel="Subtotal">@context.Subtotal.ToString("C")</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                       OnClick="@(() => RemoverItemDoPedido(context))"/>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+
+            <MudDivider/>
+
+            <div class="d-flex justify-end mt-4">
+                <MudText Typo="Typo.h6" Class="mr-4">Total do Pedido:</MudText>
+                <MudText Typo="Typo.h5" Color="Color.Primary">@TotalPedido.ToString("C")</MudText>
+            </div>
+        }
+    </MudPaper>
+
+    <div class="d-flex justify-end mt-4">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mr-2" OnClick="LimparPedido">Limpar
+        </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2" Disabled="@(!PodeFinalizarPedido())"
+                   OnClick="FinalizarPedido">Finalizar Pedido
+        </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" Disabled="@(!PodeFinalizarPedido())"
+                   OnClick="ImprimirPedido">
+            <MudIcon Icon="@Icons.Material.Filled.Print" Class="mr-2"/>
+            Imprimir
+        </MudButton>
+    </div>
+</MudContainer>
+
+@code {
+
+    // Busca de clientes
+    private string tipoBuscaCliente = "nome";
+    private string termoBuscaCliente = "";
+    private List<CustomerModel> clientesEncontrados = new List<CustomerModel>();
+    private CustomerModel clienteSelecionado;
+
+    // Busca de produtos
+    private string tipoBuscaProduto = "nome";
+    private string termoBuscaProduto = "";
+    private List<ProductModel> produtosEncontrados = new List<ProductModel>();
+    private ProductModel produtoSelecionado;
+    private int quantidadeProduto = 1;
+
+    // Pedido
+    private OrderModel pedido = new OrderModel
+    {
+        Numero = GerarNumeroPedido(),
+        Data = DateTime.Now
+    };
+
+    private List<ItemOrder> itensPedido = new List<ItemOrder>();
+
+    private decimal TotalPedido => itensPedido.Sum(i => i.Subtotal);
+
+    // Dados fictícios para demonstração
+    private List<CustomerModel> clientes = new List<CustomerModel>
+    {
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "João Silva", Phone = "(11) 98765-4321", DocumentId = "123.456.789-01" },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria Oliveira", Phone = "(11) 91234-5678", DocumentId = "987.654.321-09" },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria José", Phone = "(11) 91234-5678", DocumentId = "222.865.12-09" },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Empresa XYZ Ltda", Phone = "(11) 3123-4567", DocumentId = "12.345.678/0001-90" }
+    };
+
+    private List<ProductModel> produtos = new List<ProductModel>
+    {
+        new ProductModel { Id = 1, Codigo = "P001", Nome = "Notebook Dell", Preco = 3999.90M, Estoque = 10 },
+        new ProductModel { Id = 2, Codigo = "P002", Nome = "Mouse sem fio", Preco = 89.90M, Estoque = 50 },
+        new ProductModel { Id = 3, Codigo = "P003", Nome = "Teclado Mecânico", Preco = 249.90M, Estoque = 25 },
+        new ProductModel { Id = 4, Codigo = "P004", Nome = "Monitor 24 polegadas", Preco = 899.90M, Estoque = 15 }
+    };
+
+    private void BuscarCliente()
+    {
+        if (string.IsNullOrWhiteSpace(termoBuscaCliente))
+            return;
+
+        clientesEncontrados.Clear();
+        var termo = termoBuscaCliente.ToLower();
+
+        if (clientes.Any(c => c.Name.ToLower().Contains(termo)))
+            clientesEncontrados = clientes.Where(c => c.Name.ToLower().Contains(termo)).ToList();
+        else if (clientesEncontrados.Any(c => c.Phone.Contains(termo)))
+            clientesEncontrados = clientes.Where(c => c.Phone.Contains(termo)).ToList();
+
+        else if (clientes.Any(c => c.DocumentId.Replace(".", "").Replace("-", "").Replace("/", "")
+                     .Contains(termo.Replace(".", "").Replace("-", "").Replace("/", ""))))
+            clientesEncontrados = clientes.Where(c => c.DocumentId.Replace(".", "").Replace("-", "").Replace("/", "")
+                .Contains(termo.Replace(".", "").Replace("-", "").Replace("/", ""))).ToList();
+        else
+            Snackbar.Add("Cliente não encontrado.", Severity.Error);
+
+
+        StateHasChanged();
+    }
+
+    private void SelecionarCliente(CustomerModel cliente)
+    {
+        clienteSelecionado = cliente;
+        pedido.Cliente = cliente;
+        clientesEncontrados.Clear();
+    }
+
+    private void BuscarProduto()
+    {
+        if (string.IsNullOrWhiteSpace(termoBuscaProduto))
+            return;
+
+        produtosEncontrados.Clear();
+        var termo = termoBuscaProduto.ToLower();
+
+        switch (tipoBuscaProduto)
+        {
+            case "codigo":
+                produtosEncontrados = produtos.Where(p => p.Codigo.ToLower().Contains(termo)).ToList();
+                break;
+            case "nome":
+                produtosEncontrados = produtos.Where(p => p.Nome.ToLower().Contains(termo)).ToList();
+                break;
+        }
+        
+        StateHasChanged();
+    }
+
+    private void SelecionarProduto(ProductModel produto)
+    {
+        produtoSelecionado = produto;
+        quantidadeProduto = 1;
+        produtosEncontrados.Clear();
+    }
+
+    private void AdicionarItemAoPedido()
+    {
+        if (produtoSelecionado == null || quantidadeProduto <= 0 || quantidadeProduto > produtoSelecionado.Estoque)
+            return;
+
+// Verifica se o produto já existe no pedido
+        var itemExistente = itensPedido.FirstOrDefault(i => i.Produto.Id == produtoSelecionado.Id);
+
+        if (itemExistente != null)
+        {
+// Atualiza a quantidade se o produto já existe
+            itemExistente.Quantidade += quantidadeProduto;
+            itemExistente.AtualizarSubtotal();
+        }
+        else
+        {
+// Adiciona novo item ao pedido
+            var novoItem = new ItemOrder
+            {
+                Produto = produtoSelecionado,
+                PrecoUnitario = produtoSelecionado.Preco,
+                Quantidade = quantidadeProduto
+            };
+            novoItem.AtualizarSubtotal();
+            itensPedido.Add(novoItem);
+        }
+
+// Limpa a seleção de produto
+        produtoSelecionado = null;
+        quantidadeProduto = 1;
+    }
+
+    private void RemoverItemDoPedido(ItemOrder item)
+    {
+        itensPedido.Remove(item);
+    }
+
+    private bool PodeFinalizarPedido()
+    {
+        return clienteSelecionado != null && itensPedido.Any();
+    }
+
+    private void FinalizarPedido()
+    {
+// Aqui seria implementada a lógica de persistência do pedido
+        pedido.Itens = new List
+            <ItemOrder>(itensPedido);
+        pedido.ValorTotal = TotalPedido;
+
+        // Exibe mensagem de sucesso
+        // Este trecho seria substituído por um serviço de notificação real
+        Console.WriteLine($"Pedido {pedido.Numero} finalizado com sucesso!");
+    }
+
+    private async Task ImprimirPedido()
+    {
+        // Esta implementação usa JavaScript para abrir uma janela de impressão
+        // Na aplicação real, poderia gerar um relatório PDF ou outro formato
+        await JSRuntime.InvokeVoidAsync("imprimirPedido", pedido, itensPedido);
+    }
+
+    private void LimparPedido()
+    {
+        clienteSelecionado = null;
+        produtoSelecionado = null;
+        itensPedido.Clear();
+        pedido = new OrderModel
+        {
+            Numero = GerarNumeroPedido(),
+            Data = DateTime.Now
+        };
+    }
+
+    private static string GerarNumeroPedido()
+    {
+        // Em uma aplicação real, este método buscaria o próximo número no banco de dados
+        return DateTime.Now.ToString("yyyyMMddHHmmss");
+    }
+
+}
+
+

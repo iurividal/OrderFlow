@@ -1,0 +1,111 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 100vh;">
+    <MudPaper Elevation="3" Class="pa-8 ma-4 d-flex flex-column" Style="width: 100%; max-width: 500px; border-radius: 12px;">
+        <div class="d-flex justify-center mb-8">
+            <MudAvatar Color="Color.Primary" Size="Size.Large" Class="mb-3" Style="width: 80px; height: 80px;">
+                <MudIcon Icon="@Icons.Material.Filled.BugReport" Size="Size.Large" />
+            </MudAvatar>
+        </div>
+        
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4 primary-text" Style="font-weight: 600;">OrdemFlow</MudText>
+        <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-8">Seu micro-CRM para gerenciamento de clientes e ordens de serviço</MudText>
+        
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" 
+                          Label="Email" 
+                          @bind-Value="userModel.Email" 
+                          Required="true" 
+                          RequiredError="Email é obrigatório"
+                          Variant="Variant.Outlined" 
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Email"
+                          AdornmentColor="Color.Primary"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email inválido"})" 
+                          Class="mb-4" />
+
+            <MudTextField T="string" 
+                          Label="Senha" 
+                          @bind-Value="userModel.Password" 
+                          Required="true" 
+                          RequiredError="Senha é obrigatória"
+                          Variant="Variant.Outlined" 
+                          InputType="@_passwordInput" 
+                          Adornment="Adornment.End" 
+                          AdornmentIcon="@_passwordInputIcon" 
+                          AdornmentColor="Color.Primary"
+                          OnAdornmentClick="TogglePasswordVisibility"
+                          Class="mb-6" />
+                
+            <div class="d-flex justify-space-between align-center mb-6">
+                <MudCheckBox T="bool" @bind-Checked="userModel.RememberMe" Color="Color.Primary" Label="Lembrar-me" />
+                <MudLink Href="/reset-password" Underline="Underline.None">Esqueceu a senha?</MudLink>
+            </div>
+            
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       Size="Size.Large"
+                       FullWidth="true"
+                       OnClick="ProcessLogin"
+                       Style="border-radius: 8px; height: 50px;"
+                       Disabled="@(!success)">
+                Entrar
+            </MudButton>
+            
+            <MudDivider Class="my-6" />
+            
+            <MudText Align="Align.Center">
+                Não tem uma conta? <MudLink Href="/register" Underline="Underline.None">Cadastre-se</MudLink>
+            </MudText>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code{
+    private MudForm form;
+    private bool success;
+    private string[] errors = { };
+    private UserModel userModel = new();
+    
+    // Controle de visibilidade da senha
+    bool _isShowPassword = false;
+    InputType _passwordInput = InputType.Password;
+    string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+   
+ 
+    private void TogglePasswordVisibility()
+    {
+        if (_isShowPassword)
+        {
+            _isShowPassword = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _isShowPassword = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+    
+    private void ProcessLogin()
+    {
+        // Aqui você implementaria a lógica de autenticação
+        // Por enquanto, vamos apenas simular um login bem-sucedido
+        
+        if (success)
+        {
+            Snackbar.Add("Login realizado com sucesso!", Severity.Success);
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            Snackbar.Add("Por favor, verifique os campos obrigatórios.", Severity.Error);
+        }
+    }
+
+}

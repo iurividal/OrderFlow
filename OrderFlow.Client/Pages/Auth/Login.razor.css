@@ -1,0 +1,22 @@
+﻿.mud-input-control {
+    margin-bottom: 16px;
+}
+
+.primary-text {
+    color: var(--mud-palette-primary);
+}
+
+.mud-button-filled {
+    text-transform: none;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.mud-paper {
+    background-color: white;
+}
+
+.mud-link {
+    color: var(--mud-palette-primary);
+    font-weight: 500;
+}
