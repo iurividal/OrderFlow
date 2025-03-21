@@ -1,37 +1,35 @@
-﻿@page "/pedidos"
+﻿@page "/produtos"
+
 @inject NavigationManager NavigationManager
 
-
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">Pedidos</MudText>
+    <MudText Typo="Typo.h4" Class="mb-4">Produtos</MudText>
 
     <MudPaper Class="pa-4 mb-4">
         <MudGrid>
             <MudItem xs="12" sm="3">
-                <MudTextField @bind-Value="searchString" Placeholder="Buscar por cliente..." Adornment="Adornment.Start"
+                <MudTextField @bind-Value="searchString" Placeholder="Buscar por produto..." Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
                               Class="mt-0"></MudTextField>
             </MudItem>
         </MudGrid>
     </MudPaper>
 
-    <MudTable Items="@orders" Filter="@(FilterFunc)" Hover="true" Dense="true" Bordered="true" Striped="true"
+    <MudTable Items="@produtos" Filter="@(FilterFunc)" Hover="true" Dense="true" Bordered="true" Striped="true"
               LoadingProgressColor="Color.Primary">
         <HeaderContent>
-            <MudTh>Número</MudTh>
-            <MudTh>Nome</MudTh>
-            <MudTh>Valor</MudTh>
-            <MudTh>Data</MudTh>
+            <MudTh>Codigo</MudTh>
+            <MudTh>Produto</MudTh>
+            <MudTh>Preço</MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Numero">@context.Numero</MudTd>
-            <MudTd DataLabel="Nome">@context.Cliente.Name</MudTd>
-            <MudTd DataLabel="Valor">@context.ValorTotal</MudTd>
-            <MudTd DataLabel="Data">@context.Data</MudTd>
+            <MudTd DataLabel="Codigo">@context.Codigo</MudTd>
+            <MudTd DataLabel="Produto">@context.Nome</MudTd>
+            <MudTd DataLabel="Preço">@context.Preco</MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
-                           OnClick="@(() => ViewDetails(context.Numero))">
+                           OnClick="@(() => ViewDetails(context.Codigo))">
                     Detalhes
                 </MudButton>
             </MudTd>
@@ -56,28 +54,28 @@
 
 @code {
     private string searchString = "";
-    private List<OrderModel> orders = new List<OrderModel>();
+    private List<ProductModel> produtos = new List<ProductModel>();
 
     protected override void OnInitialized()
     {
         // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
-        orders = new List<OrderModel>
+        produtos = new List<ProductModel>
         {
-            new OrderModel { Cliente = new CustomerModel("João Silva"), Data = DateTime.Now, Numero = "P1231231", ValorTotal = 330.00m },
-            new OrderModel { Cliente = new CustomerModel("Maria Souza"), Data = DateTime.Now, Numero = "P1231232", ValorTotal = 450.00m },
-            new OrderModel { Cliente = new CustomerModel("José Santos"), Data = DateTime.Now, Numero = "P1231233", ValorTotal = 250.00m },
+            new ProductModel { Id = 1, Codigo = "P01", Nome = "Produto 1", Preco = 10.0m, Estoque = 10 },
+            new ProductModel { Id = 2, Codigo = "P02", Nome = "Produto 2", Preco = 20.0m, Estoque = 20 },
+            new ProductModel { Id = 3, Codigo = "P03", Nome = "Produto 3", Preco = 30.0m, Estoque = 30 },
         };
     }
 
-    private bool FilterFunc(OrderModel element)
+    private bool FilterFunc(ProductModel element)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
 
-        if (element.Cliente.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Nome.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (element.Numero.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Codigo.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;
@@ -85,12 +83,12 @@
 
     private void ViewDetails(string id)
     {
-        NavigationManager.NavigateTo($"/pedido/{id}");
+        NavigationManager.NavigateTo($"/produtos/{id}");
     }
 
     private void NavigateToCreate()
     {
-        NavigationManager.NavigateTo("/cadastro-pedido");
+        NavigationManager.NavigateTo("/cadastro-produto");
     }
 
 }

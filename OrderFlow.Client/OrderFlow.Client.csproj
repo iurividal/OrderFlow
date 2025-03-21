@@ -22,4 +22,8 @@
       <ProjectReference Include="..\OrderFlow.Shared\OrderFlow.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="wwwroot\Pages\Orders\RegisterOrder.js" />
+    </ItemGroup>
+
 </Project>

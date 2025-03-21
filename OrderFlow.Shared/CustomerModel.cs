@@ -30,7 +30,7 @@ public class CustomerModel
 public class AdressModel
 {
     // Properties Adress,Number,Complement,Neighborhood,City,State,ZipCode
-    public string Adress { get; set; }
+    public string Street { get; set; }
     public string Number { get; set; }
     public string Complement { get; set; }
     public string Neighborhood { get; set; }
