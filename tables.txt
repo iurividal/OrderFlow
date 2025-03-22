@@ -1,0 +1,88 @@
+CREATE TABLE customers (
+    Id BIGSERIAL PRIMARY KEY,                  -- Id sequencial auto-incremento (BIGSERIAL)
+    Guid UUID NOT NULL DEFAULT gen_random_uuid(),  -- Guid único gerado automaticamente
+    Name VARCHAR(255) NOT NULL,                 -- Nome do cliente
+    Email VARCHAR(255) NOT NULL UNIQUE,         -- Email único
+    Phone VARCHAR(15),                         -- Telefone
+    DocumentId VARCHAR(20),                    -- Documento de identificação
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Data de criação
+);
+
+CREATE TABLE addresses (
+    Id BIGSERIAL PRIMARY KEY,                     -- Id sequencial auto-incremento
+    CustomerId BIGINT NOT NULL,                    -- Chave estrangeira para a tabela customers
+    Street VARCHAR(255) NOT NULL,                  -- Rua
+    Number VARCHAR(50),                            -- Número
+    Complement VARCHAR(100),                       -- Complemento
+    Neighborhood VARCHAR(100),                     -- Bairro
+    City VARCHAR(100),                             -- Cidade
+    State VARCHAR(50),                             -- Estado
+    ZipCode VARCHAR(20),                           -- CEP
+    AddressType VARCHAR(50),                       -- Tipo de endereço (Ex: Residencial, Comercial)
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data de criação
+    CONSTRAINT fk_customer FOREIGN KEY (CustomerId) REFERENCES customers(Id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE access_levels (
+    Id INT PRIMARY KEY,                       -- Id do nível de acesso
+    Name VARCHAR(50) NOT NULL                 -- Nome do nível de acesso (Ex: 'User', 'Administrator')
+);
+
+
+INSERT INTO access_levels (Id, Name) VALUES
+(1, 'User'),
+(2, 'Administrator');
+
+CREATE TABLE users (
+    Id SERIAL PRIMARY KEY,                   -- ID do usuário (sequencial auto-incremento)
+    Username VARCHAR(100) UNIQUE NOT NULL,    -- Nome de usuário único
+    FullName VARCHAR(255),                    -- Nome completo do usuário
+    Email VARCHAR(255) UNIQUE NOT NULL,       -- Email único
+    Password VARCHAR(255) NOT NULL,           -- Senha do usuário
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data de criação
+    IsActive BOOLEAN DEFAULT TRUE,            -- Status se o usuário está ativo ou não
+    AccessLevel INT NOT NULL,                 -- Nível de acesso do usuário
+    CONSTRAINT fk_access_level FOREIGN KEY (AccessLevel) REFERENCES access_levels(Id) -- Relacionamento com a tabela de níveis de acesso
+);
+
+
+
+CREATE TABLE products (
+    Id SERIAL PRIMARY KEY,                     -- Id sequencial auto-incremento
+    Code VARCHAR(50) NOT NULL UNIQUE,          -- Código único para o produto
+    Name VARCHAR(255) NOT NULL,                -- Nome do produto
+    Price DECIMAL(10, 2) NOT NULL,             -- Preço do produto
+    Stock INT NOT NULL,                        -- Quantidade em estoque
+    MinimumStock INT NOT NULL,                 -- Estoque mínimo
+    UnitType VARCHAR(50) NOT NULL,             -- Tipo de medida (unidade, kg, etc.)
+    CreatedBy VARCHAR(100) NOT NULL,           -- Usuário que criou
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Data de criação
+    UpdatedBy VARCHAR(100),                    -- Usuário que atualizou
+    UpdatedAt TIMESTAMP,                       -- Data de atualização
+    CONSTRAINT fk_created_by FOREIGN KEY (CreatedBy) REFERENCES users(username) ON DELETE SET NULL,  -- Relacionamento com tabela de usuários
+    CONSTRAINT fk_updated_by FOREIGN KEY (UpdatedBy) REFERENCES users(username) ON DELETE SET NULL  -- Relacionamento com tabela de usuários
+);
+
+
+CREATE TABLE orders (
+    Id SERIAL PRIMARY KEY,
+    Number VARCHAR(50) NOT NULL UNIQUE,
+    Date TIMESTAMP,
+    CustomerId BIGINT NOT NULL,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (CustomerId) REFERENCES customers(Id) ON DELETE CASCADE
+);
+
+CREATE TABLE order_items (
+    Id SERIAL PRIMARY KEY,
+    OrderId BIGINT NOT NULL,
+    ProductId INT NOT NULL,
+    Quantity INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES orders(Id) ON DELETE CASCADE,
+    FOREIGN KEY (ProductId) REFERENCES products(Id) ON DELETE CASCADE
+);
+
+
+
