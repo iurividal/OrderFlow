@@ -66,8 +66,8 @@ public class CustomerRepository : ICustomerRepository
         foreach (var address in customer.Address)
         {
             var addressQuery = @"
-                INSERT INTO addresses (CustomerId, Street, Number, Neighborhood, City, State, ZipCode,AdressType)
-                VALUES (@CustomerId, @Street, @Number, @Neighborhood, @City, @State, @ZipCode,@AdressType)";
+                INSERT INTO addresses (CustomerId, Street, Number, Neighborhood, City, State, ZipCode,AddressType)
+                VALUES (@CustomerId, @Street, @Number, @Neighborhood, @City, @State, @ZipCode,@AddressType)";
             await connection.ExecuteAsync(addressQuery, new
             {
                 CustomerId = customerId,
@@ -77,7 +77,7 @@ public class CustomerRepository : ICustomerRepository
                 address.City,
                 address.State,
                 address.ZipCode,
-                AdressType = address.AddressType,
+                AddressType = address.AddressType,
                 
                 
             });

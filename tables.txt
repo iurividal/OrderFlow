@@ -18,7 +18,7 @@ CREATE TABLE addresses (
     City VARCHAR(100),                             -- Cidade
     State VARCHAR(50),                             -- Estado
     ZipCode VARCHAR(20),                           -- CEP
-    AddressType VARCHAR(50),                       -- Tipo de endereço (Ex: Residencial, Comercial)
+    AddressType int,                       -- Tipo de endereço (Ex: Residencial, Comercial)
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data de criação
     CONSTRAINT fk_customer FOREIGN KEY (CustomerId) REFERENCES customers(Id) ON DELETE CASCADE
 );
