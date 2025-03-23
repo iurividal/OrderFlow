@@ -28,7 +28,7 @@ public class CustomerRepository : ICustomerRepository
         var customer = await connection.QueryFirstOrDefaultAsync<CustomerEntity>(query, new { Id = customerId });
         
         if(customer != null)
-            customer.Adress = await connection.QueryFirstOrDefaultAsync<List<AdressEntity>>("Select * from addresses where CustomerId = @Id", new { Id = customerId });
+            customer.Address = await connection.QueryFirstOrDefaultAsync<List<AddressEntity>>("Select * from addresses where CustomerId = @Id", new { Id = customerId });
         
         
         return customer;
@@ -39,6 +39,16 @@ public class CustomerRepository : ICustomerRepository
         using var connection = _connectionFactory.CreateConnection();
         var query = "SELECT * FROM customers";
         var customers = await connection.QueryAsync<CustomerEntity>(query);
+
+        if (customers != null)
+        {
+            foreach (var customer in customers)
+            {
+                customer.Address = connection.Query<AddressEntity>("Select * from addresses where CustomerId = @Id",
+                    new { Id = customer.Id }).ToList();
+            }
+        }
+        
         return customers;
     }
     
@@ -53,21 +63,27 @@ public class CustomerRepository : ICustomerRepository
         var customerId = await connection.ExecuteScalarAsync<long>(query, customer);
         
         // Inserir os endereços do cliente
-        foreach (var address in customer.Adress)
+        foreach (var address in customer.Address)
         {
             var addressQuery = @"
-                INSERT INTO addresses (CustomerId, Street, Number, City, State, ZipCode)
-                VALUES (@CustomerId, @Street, @Number, @City, @State, @ZipCode)";
+                INSERT INTO addresses (CustomerId, Street, Number, Neighborhood, City, State, ZipCode,AdressType)
+                VALUES (@CustomerId, @Street, @Number, @Neighborhood, @City, @State, @ZipCode,@AdressType)";
             await connection.ExecuteAsync(addressQuery, new
             {
                 CustomerId = customerId,
                 address.Street,
                 address.Number,
+                address.Neighborhood,
                 address.City,
                 address.State,
-                address.ZipCode
+                address.ZipCode,
+                AdressType = address.AddressType,
+                
+                
             });
         }
+        
+     
         return customerId;
     }
     

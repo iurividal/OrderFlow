@@ -17,7 +17,7 @@ public class CustomerMappingProfile : Profile
             .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
             .ForMember(dest => dest.DocumentId, opt => opt.MapFrom(src => src.DocumentId))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-            .ForMember(dest => dest.Adress, opt => opt.MapFrom(src => src.Adress)); // Se necessário
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address)); // Se necessário
 
 
         // Mapeamento de CustomerEntity para CustomerModel
@@ -29,6 +29,13 @@ public class CustomerMappingProfile : Profile
             .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
             .ForMember(dest => dest.DocumentId, opt => opt.MapFrom(src => src.DocumentId))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-            .ForMember(dest => dest.Adress, opt => opt.MapFrom(src => src.Adress));
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+
+        // Mapeamento de AdressModel para AdressEntity e vice-versa
+       // CreateMap<AdressModel, AdressEntity>();
+
+      //  CreateMap<AdressEntity, AdressModel>();
+
+       
     }
 }

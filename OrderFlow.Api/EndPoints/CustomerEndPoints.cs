@@ -36,7 +36,22 @@ public static class CustomerEndPoints
 
             return Results.Created($"/customers/{response}", response);
         });
+        
+        // DELETE /customers/{id}
+        app.MapDelete("/customers/{id}", async (ICustomerService service, long id) =>
+        {
+            var response = await service.DeleteCustomerAsync(id);
+
+            if (!response)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.NoContent();
+        });
 
         return app;
     }
+    
+
 }

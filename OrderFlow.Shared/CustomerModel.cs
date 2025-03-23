@@ -12,7 +12,7 @@ public class CustomerModel
     public string DocumentId { get; set; }
 
     public DateTime CreatedAt { get; set; }
-    public List<AdressModel> Adress { get; set; }
+    public List<AddressModel> Address { get; set; } = new();
 
     public CustomerModel()
     {
@@ -29,25 +29,4 @@ public class CustomerModel
         Name = name;
         DocumentId = documentId;
     }
-}
-
-public class AdressModel
-{
-    // Properties Adress,Number,Complement,Neighborhood,City,State,ZipCode
-    public string Street { get; set; }
-    public string Number { get; set; }
-    public string Complement { get; set; }
-    public string Neighborhood { get; set; }
-    public string City { get; set; }
-    public string State { get; set; }
-    public string ZipCode { get; set; }
-    public TypeAdress AdressType { get; set; } //Residencial, //Comercial, //Entrega, //Cobrança
-}
-
-public enum TypeAdress
-{
-    Residencial,
-    Comercial,
-    Entrega,
-    Cobrança
 }

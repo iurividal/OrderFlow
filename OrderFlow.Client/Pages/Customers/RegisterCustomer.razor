@@ -30,20 +30,20 @@
             <MudDivider Class="my-6"/>
 
             <MudExpansionPanels>
-                @foreach (var address in model.Adress)
+                @foreach (var address in model.Address)
                 {
                     <MudExpansionPanel>
                         <TitleContent>
-                            <MudText Typo="Typo.h6">Endereço - @address.AdressType</MudText>
+                            <MudText Typo="Typo.h6">Endereço - @address.AddressType</MudText>
                         </TitleContent>
                         <ChildContent>
                             <MudGrid>
                                 <MudItem xs="12" sm="6">
-                                    <MudSelect @bind-Value="address.AdressType" Label="Tipo de Endereço"
+                                    <MudSelect @bind-Value="address.AddressType" Label="Tipo de Endereço"
                                                Required="true">
-                                        @foreach (var type in Enum.GetValues(typeof(TypeAdress)))
+                                        @foreach (var type in Enum.GetValues(typeof(TypeAddress)))
                                         {
-                                            <MudSelectItem Value="@((TypeAdress)type)">@type</MudSelectItem>
+                                            <MudSelectItem Value="@((TypeAddress)type)">@type</MudSelectItem>
                                         }
                                     </MudSelect>
                                 </MudItem>
@@ -104,20 +104,20 @@
 
     protected override void OnInitialized()
     {
-        model.Adress = new List<AdressModel>();
+        model.Address = new List<AddressModel>();
         AddAddress();
     }
 
     private void AddAddress()
     {
-        model.Adress.Add(new AdressModel { AdressType = TypeAdress.Residencial });
+        model.Address.Add(new AddressModel { AddressType = "Residencial" });
     }
 
-    private void RemoveAddress(AdressModel address)
+    private void RemoveAddress(AddressModel address)
     {
-        if (model.Adress.Count > 1)
+        if (model.Address.Count > 1)
         {
-            model.Adress.Remove(address);
+            model.Address.Remove(address);
         }
     }
 
@@ -141,7 +141,7 @@
     {
         // form.Reset();
         model = new CustomerModel();
-        model.Adress = new List<AdressModel>();
+        model.Address = new List<AddressModel>();
         AddAddress();
     }
 

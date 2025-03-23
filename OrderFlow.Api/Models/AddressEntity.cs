@@ -1,6 +1,8 @@
-﻿namespace OrderFlow.Api.Models;
+﻿using OrderFlow.Shared;
 
-public class AdressEntity
+namespace OrderFlow.Api.Models;
+
+public class AddressEntity
 {
     public long Id { get; set; }
 
@@ -20,5 +22,5 @@ public class AdressEntity
     
     public string ZipCode { get; set; }
 
-    public string AdressType { get; set; }
+    public TypeAddress AddressType { get; set; }
 }

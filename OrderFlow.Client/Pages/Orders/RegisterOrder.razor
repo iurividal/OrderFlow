@@ -207,10 +207,10 @@
     // Dados fictícios para demonstração
     private List<CustomerModel> clientes = new List<CustomerModel>
     {
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "João Silva", Phone = "(11) 98765-4321", DocumentId = "123.456.789-01", Adress = new List<AdressModel>{ new AdressModel { Street ="RUA 1",City = "ITU", Number = "A2",AdressType = TypeAdress.Residencial } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria Oliveira", Phone = "(11) 91234-5678", DocumentId = "987.654.321-09", Adress = new List<AdressModel>{ new AdressModel { Street ="RUA 2",City = "ITU", Number = "A3",AdressType = TypeAdress.Residencial } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria José", Phone = "(11) 91234-5678", DocumentId = "222.865.12-09", Adress = new List<AdressModel>{ new AdressModel { Street ="RUA 3",City = "ITU", Number = "A4",AdressType = TypeAdress.Residencial } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Empresa XYZ Ltda", Phone = "(11) 3123-4567", DocumentId = "12.345.678/0001-90", Adress = new List<AdressModel>{ new AdressModel { Street ="RUA 4",City = "ITU", Number = "A5",AdressType = TypeAdress.Residencial } } }
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "João Silva", Phone = "(11) 98765-4321", DocumentId = "123.456.789-01", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 1",City = "ITU", Number = "A2",AddressType = "Residencial" } } },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria Oliveira", Phone = "(11) 91234-5678", DocumentId = "987.654.321-09", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 2",City = "ITU", Number = "A3",AddressType = "Residencial" } } },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria José", Phone = "(11) 91234-5678", DocumentId = "222.865.12-09", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 3",City = "ITU", Number = "A4",AddressType = "Residencial" } } },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Empresa XYZ Ltda", Phone = "(11) 3123-4567", DocumentId = "12.345.678/0001-90", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 4",City = "ITU", Number = "A5",AddressType = "Residencial" } } }
     };
 
     private List<ProductModel> produtos = new List<ProductModel>

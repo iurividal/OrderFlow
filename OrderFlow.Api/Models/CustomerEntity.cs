@@ -16,5 +16,5 @@ public class CustomerEntity
 
     public DateTime CreatedAt { get; set; }
 
-    public  List<AdressEntity> Adress { get; set; }
+    public  List<AddressEntity> Address { get; set; }
 }
