@@ -1,5 +1,9 @@
 ﻿@page "/cadastro-cliente"
 @using System.ComponentModel.DataAnnotations
+@using OrderFlow.Client.Services
+@inject ICustomerService _customerService
+@inject ISnackbar SnackBar
+@inject NavigationManager NavigationManager
 
 <MudCard>
     <MudCardHeader>
@@ -39,7 +43,7 @@
                         <ChildContent>
                             <MudGrid>
                                 <MudItem xs="12" sm="6">
-                                    <MudSelect @bind-Value="address.AddressType" Label="Tipo de Endereço"
+                                    <MudSelect @bind-Value="_typeAddressSelected" Label="Tipo de Endereço"
                                                Required="true">
                                         @foreach (var type in Enum.GetValues(typeof(TypeAddress)))
                                         {
@@ -101,6 +105,7 @@
     private bool success;
     private string[] errors = { };
     private MudForm form;
+    private TypeAddress _typeAddressSelected = TypeAddress.Residencial;
 
     protected override void OnInitialized()
     {
@@ -110,7 +115,7 @@
 
     private void AddAddress()
     {
-        model.Address.Add(new AddressModel { AddressType = "Residencial" });
+        model.Address.Add(new AddressModel { AddressType = _typeAddressSelected.ToString() });
     }
 
     private void RemoveAddress(AddressModel address)
@@ -121,25 +126,31 @@
         }
     }
 
-    private void Submit()
+    private async Task Submit()
     {
         form.Validate();
 
         if (success)
         {
-            // Aqui você pode implementar a lógica para salvar os dados
-            // Por exemplo, chamar um serviço para gravar no banco de dados
+            try
+            {
+                await _customerService.AddCustomerAsync(model);
 
-            // SubmitService.SaveClient(model);
-
-            // Exibe uma mensagem de sucesso
-            // SnackBar.Add("Cliente cadastrado com sucesso!", Severity.Success);
+                // Exibe uma mensagem de sucesso
+                SnackBar.Add("Cliente cadastrado com sucesso!", Severity.Success);
+                NavigationManager.NavigateTo("/clientes");
+            }
+            catch (Exception e)
+            {
+                // Exibe uma mensagem de sucesso
+                SnackBar.Add(e.Message, Severity.Error);
+            }
         }
     }
 
-    private void Reset()
+    private async Task Reset()
     {
-        // form.Reset();
+        await form.ResetAsync();
         model = new CustomerModel();
         model.Address = new List<AddressModel>();
         AddAddress();

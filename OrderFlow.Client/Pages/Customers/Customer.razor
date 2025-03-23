@@ -1,6 +1,8 @@
 ﻿@page "/clientes"
 @using System.Collections.Generic
+@using OrderFlow.Client.Services
 @inject NavigationManager NavigationManager
+@inject ICustomerService _customerService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <MudText Typo="Typo.h4" Class="mb-4">Clientes</MudText>
@@ -56,17 +58,9 @@
     private string searchString = "";
     private List<CustomerModel> clients = new List<CustomerModel>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
-        clients = new List<CustomerModel>
-        {
-            new CustomerModel { Name = "João Silva", Email = "joao.silva@email.com", Phone = "(11) 98765-4321" },
-            new CustomerModel { Name = "Maria Oliveira", Email = "maria.oliveira@email.com", Phone = "(11) 91234-5678" },
-            new CustomerModel { Name = "Carlos Santos", Email = "carlos.santos@email.com", Phone = "(21) 99876-5432" },
-            new CustomerModel { Name = "Ana Pereira", Email = "ana.pereira@email.com", Phone = "(31) 97654-3210" },
-            new CustomerModel { Name = "Paulo Costa", Email = "paulo.costa@email.com", Phone = "(41) 95432-1098" },
-        };
+        clients = await _customerService.GetCustomersAsync();
     }
 
     private bool FilterFunc(CustomerModel element)

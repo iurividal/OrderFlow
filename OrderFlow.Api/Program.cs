@@ -17,6 +17,17 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OrderflowPolicy", policy =>
+    {
+        policy.WithOrigins("https://localhost:7120")  // URL do seu Blazor WASM
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();  // Se você estiver enviando cookies/autenticação
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +37,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("OrderflowPolicy");
 
 app.MapCustomerEndpoints();
 
