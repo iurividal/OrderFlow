@@ -24,12 +24,12 @@
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Codigo">@context.Codigo</MudTd>
-            <MudTd DataLabel="Produto">@context.Nome</MudTd>
-            <MudTd DataLabel="Preço">@context.Preco</MudTd>
+            <MudTd DataLabel="Codigo">@context.Code</MudTd>
+            <MudTd DataLabel="Produto">@context.Name</MudTd>
+            <MudTd DataLabel="Preço">@context.Price</MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
-                           OnClick="@(() => ViewDetails(context.Codigo))">
+                           OnClick="@(() => ViewDetails(context.Code))">
                     Detalhes
                 </MudButton>
             </MudTd>
@@ -61,9 +61,9 @@
         // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
         produtos = new List<ProductModel>
         {
-            new ProductModel { Id = 1, Codigo = "P01", Nome = "Produto 1", Preco = 10.0m, Estoque = 10 },
-            new ProductModel { Id = 2, Codigo = "P02", Nome = "Produto 2", Preco = 20.0m, Estoque = 20 },
-            new ProductModel { Id = 3, Codigo = "P03", Nome = "Produto 3", Preco = 30.0m, Estoque = 30 },
+            new ProductModel { Id = 1, Code = "P01", Name = "Produto 1", Price = 10.0m, Stock = 10 },
+            new ProductModel { Id = 2, Code = "P02", Name = "Produto 2", Price = 20.0m, Stock = 20 },
+            new ProductModel { Id = 3, Code = "P03", Name = "Produto 3", Price = 30.0m, Stock = 30 },
         };
     }
 
@@ -72,10 +72,10 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
 
-        if (element.Nome.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (element.Codigo.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

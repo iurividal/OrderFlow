@@ -47,8 +47,8 @@ public class OrderRepository : IOrderRepository
 
         var orderQuery = @"
                 INSERT INTO orders (Number, Date, CustomerId, TotalAmount)
-                VALUES (@Number, @Date, @CustomerId, @TotalAmount);
-                SELECT CAST(SCOPE_IDENTITY() AS BIGINT)";
+                VALUES (@Number, @Date, @CustomerId, @TotalAmount)
+                 RETURNING Id";
 
         var orderId = await connection.ExecuteScalarAsync<long>(orderQuery, order);
 

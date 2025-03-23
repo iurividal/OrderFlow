@@ -11,8 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
 builder.Services.AddEndpointsApiExplorer();
@@ -21,10 +24,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("OrderflowPolicy", policy =>
     {
-        policy.WithOrigins("https://localhost:7120")  // URL do seu Blazor WASM
+        policy.WithOrigins("https://localhost:7120") // URL do seu Blazor WASM
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials();  // Se você estiver enviando cookies/autenticação
+            .AllowCredentials(); // Se você estiver enviando cookies/autenticação
     });
 });
 
@@ -37,16 +40,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseCors("OrderflowPolicy");
 
-app.MapCustomerEndpoints();
+app.MapCustomerEndpoints()
+    .MapProductEndpoints()
+    .MapOrderEndpoints();
+
 
 app.UseHttpsRedirection();
 
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

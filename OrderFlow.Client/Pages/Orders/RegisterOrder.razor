@@ -86,10 +86,10 @@
                     <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Código">@context.Codigo</MudTd>
-                    <MudTd DataLabel="Nome">@context.Nome</MudTd>
-                    <MudTd DataLabel="Preço">@context.Preco.ToString("C")</MudTd>
-                    <MudTd DataLabel="Estoque">@context.Estoque</MudTd>
+                    <MudTd DataLabel="Código">@context.Code</MudTd>
+                    <MudTd DataLabel="Nome">@context.Name</MudTd>
+                    <MudTd DataLabel="Preço">@context.Price.ToString("C")</MudTd>
+                    <MudTd DataLabel="Estoque">@context.Stock</MudTd>
                     <MudTd>
                         <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
                                    OnClick="@(() => SelecionarProduto(context))">Selecionar
@@ -102,13 +102,13 @@
         @if (produtoSelecionado != null)
         {
             <MudPaper Elevation="0" Class="pa-2 mt-2 d-flex align-center mud-background-gray">
-                <MudText Typo="Typo.body1"><b>Produto:</b> @produtoSelecionado.Nome</MudText>
+                <MudText Typo="Typo.body1"><b>Produto:</b> @produtoSelecionado.Name</MudText>
                 <MudSpacer/>
-                <MudText Typo="Typo.body1" Class="mx-2"><b>Código:</b> @produtoSelecionado.Codigo</MudText>
+                <MudText Typo="Typo.body1" Class="mx-2"><b>Código:</b> @produtoSelecionado.Code</MudText>
                 <MudSpacer/>
-                <MudText Typo="Typo.body1"><b>Preço:</b> @produtoSelecionado.Preco.ToString("C")</MudText>
+                <MudText Typo="Typo.body1"><b>Preço:</b> @produtoSelecionado.Price.ToString("C")</MudText>
                 <MudSpacer/>
-                <MudNumericField @bind-Value="quantidadeProduto" Label="Qtd" Min="1" Max="@produtoSelecionado.Estoque"/>
+                <MudNumericField @bind-Value="quantidadeProduto" Label="Qtd" Min="1" Max="@produtoSelecionado.Stock"/>
                 <MudSpacer/>
                 <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" Class="ml-2"
                            OnClick="AdicionarItemAoPedido">Adicionar ao Pedido
@@ -138,10 +138,10 @@
                     <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Código">@context.Produto.Codigo</MudTd>
-                    <MudTd DataLabel="Produto">@context.Produto.Nome</MudTd>
-                    <MudTd DataLabel="Preço Unit.">@context.PrecoUnitario.ToString("C")</MudTd>
-                    <MudTd DataLabel="Quantidade">@context.Quantidade</MudTd>
+                    <MudTd DataLabel="Código">@context.Product.Code</MudTd>
+                    <MudTd DataLabel="Produto">@context.Product.Name</MudTd>
+                    <MudTd DataLabel="Preço Unit.">@context.Price.ToString("C")</MudTd>
+                    <MudTd DataLabel="Quantidade">@context.Quantity</MudTd>
                     <MudTd DataLabel="Subtotal">@context.Subtotal.ToString("C")</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
@@ -192,12 +192,12 @@
     {
         await JSRuntime.InvokeVoidAsync("import", "./Pages/Orders/RegisterOrder.js");
     }
-    
+
     // Pedido
     private OrderModel pedido = new OrderModel
     {
-        Numero = GerarNumeroPedido(),
-        Data = DateTime.Now
+        Number = GerarNumeroPedido(),
+        Date = DateTime.Now
     };
 
     private List<ItemOrder> itensPedido = new List<ItemOrder>();
@@ -207,18 +207,18 @@
     // Dados fictícios para demonstração
     private List<CustomerModel> clientes = new List<CustomerModel>
     {
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "João Silva", Phone = "(11) 98765-4321", DocumentId = "123.456.789-01", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 1",City = "ITU", Number = "A2",AddressType = "Residencial" } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria Oliveira", Phone = "(11) 91234-5678", DocumentId = "987.654.321-09", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 2",City = "ITU", Number = "A3",AddressType = "Residencial" } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria José", Phone = "(11) 91234-5678", DocumentId = "222.865.12-09", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 3",City = "ITU", Number = "A4",AddressType = "Residencial" } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Empresa XYZ Ltda", Phone = "(11) 3123-4567", DocumentId = "12.345.678/0001-90", Address = new List<AddressModel>{ new AddressModel { Street ="RUA 4",City = "ITU", Number = "A5",AddressType = "Residencial" } } }
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "João Silva", Phone = "(11) 98765-4321", DocumentId = "123.456.789-01", Address = new List<AddressModel> { new AddressModel { Street = "RUA 1", City = "ITU", Number = "A2", AddressType = "Residencial" } } },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria Oliveira", Phone = "(11) 91234-5678", DocumentId = "987.654.321-09", Address = new List<AddressModel> { new AddressModel { Street = "RUA 2", City = "ITU", Number = "A3", AddressType = "Residencial" } } },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria José", Phone = "(11) 91234-5678", DocumentId = "222.865.12-09", Address = new List<AddressModel> { new AddressModel { Street = "RUA 3", City = "ITU", Number = "A4", AddressType = "Residencial" } } },
+        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Empresa XYZ Ltda", Phone = "(11) 3123-4567", DocumentId = "12.345.678/0001-90", Address = new List<AddressModel> { new AddressModel { Street = "RUA 4", City = "ITU", Number = "A5", AddressType = "Residencial" } } }
     };
 
     private List<ProductModel> produtos = new List<ProductModel>
     {
-        new ProductModel { Id = 1, Codigo = "P001", Nome = "Notebook Dell", Preco = 3999.90M, Estoque = 10 },
-        new ProductModel { Id = 2, Codigo = "P002", Nome = "Mouse sem fio", Preco = 89.90M, Estoque = 50 },
-        new ProductModel { Id = 3, Codigo = "P003", Nome = "Teclado Mecânico", Preco = 249.90M, Estoque = 25 },
-        new ProductModel { Id = 4, Codigo = "P004", Nome = "Monitor 24 polegadas", Preco = 899.90M, Estoque = 15 }
+        new ProductModel { Id = 1, Code = "P001", Name = "Notebook Dell", Price = 3999.90M, Stock = 10 },
+        new ProductModel { Id = 2, Code = "P002", Name = "Mouse sem fio", Price = 89.90M, Stock = 50 },
+        new ProductModel { Id = 3, Code = "P003", Name = "Teclado Mecânico", Price = 249.90M, Stock = 25 },
+        new ProductModel { Id = 4, Code = "P004", Name = "Monitor 24 polegadas", Price = 899.90M, Stock = 15 }
     };
 
     private void BuscarCliente()
@@ -248,7 +248,7 @@
     private void SelecionarCliente(CustomerModel cliente)
     {
         clienteSelecionado = cliente;
-        pedido.Cliente = cliente;
+        pedido.Customer = cliente;
         clientesEncontrados.Clear();
     }
 
@@ -263,13 +263,13 @@
         switch (tipoBuscaProduto)
         {
             case "codigo":
-                produtosEncontrados = produtos.Where(p => p.Codigo.ToLower().Contains(termo)).ToList();
+                produtosEncontrados = produtos.Where(p => p.Code.ToLower().Contains(termo)).ToList();
                 break;
             case "nome":
-                produtosEncontrados = produtos.Where(p => p.Nome.ToLower().Contains(termo)).ToList();
+                produtosEncontrados = produtos.Where(p => p.Name.ToLower().Contains(termo)).ToList();
                 break;
         }
-        
+
         StateHasChanged();
     }
 
@@ -282,16 +282,16 @@
 
     private void AdicionarItemAoPedido()
     {
-        if (produtoSelecionado == null || quantidadeProduto <= 0 || quantidadeProduto > produtoSelecionado.Estoque)
+        if (produtoSelecionado == null || quantidadeProduto <= 0 || quantidadeProduto > produtoSelecionado.Stock)
             return;
 
 // Verifica se o produto já existe no pedido
-        var itemExistente = itensPedido.FirstOrDefault(i => i.Produto.Id == produtoSelecionado.Id);
+        var itemExistente = itensPedido.FirstOrDefault(i => i.Product.Id == produtoSelecionado.Id);
 
         if (itemExistente != null)
         {
 // Atualiza a quantidade se o produto já existe
-            itemExistente.Quantidade += quantidadeProduto;
+            itemExistente.Quantity += quantidadeProduto;
             itemExistente.AtualizarSubtotal();
         }
         else
@@ -299,9 +299,9 @@
 // Adiciona novo item ao pedido
             var novoItem = new ItemOrder
             {
-                Produto = produtoSelecionado,
-                PrecoUnitario = produtoSelecionado.Preco,
-                Quantidade = quantidadeProduto
+                Product = produtoSelecionado,
+                Price = produtoSelecionado.Price,
+                Quantity = quantidadeProduto
             };
             novoItem.AtualizarSubtotal();
             itensPedido.Add(novoItem);
@@ -325,13 +325,13 @@
     private void FinalizarPedido()
     {
 // Aqui seria implementada a lógica de persistência do pedido
-        pedido.Itens = new List
+        pedido.Items = new List
             <ItemOrder>(itensPedido);
-        pedido.ValorTotal = TotalPedido;
+        pedido.TotalValue = TotalPedido;
 
         // Exibe mensagem de sucesso
         // Este trecho seria substituído por um serviço de notificação real
-        Console.WriteLine($"Pedido {pedido.Numero} finalizado com sucesso!");
+        Console.WriteLine($"Pedido {pedido.Number} finalizado com sucesso!");
     }
 
     private async Task ImprimirPedido()
@@ -348,8 +348,8 @@
         itensPedido.Clear();
         pedido = new OrderModel
         {
-            Numero = GerarNumeroPedido(),
-            Data = DateTime.Now
+            Number = GerarNumeroPedido(),
+            Date = DateTime.Now
         };
     }
 

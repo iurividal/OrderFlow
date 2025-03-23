@@ -2,13 +2,16 @@
 
 public class ItemOrder
 {
-    public ProductModel Produto { get; set; }
-    public decimal PrecoUnitario { get; set; }
-    public int Quantidade { get; set; }
+    public ProductModel Product { get; set; }
+    public decimal Price { get; set; }
+
     public decimal Subtotal { get; set; }
+
+    public int Quantity { get; set; }
+
 
     public void AtualizarSubtotal()
     {
-        Subtotal = PrecoUnitario * Quantidade;
+        Subtotal = Price * Quantity;
     }
 }

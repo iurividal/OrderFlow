@@ -5,12 +5,12 @@ public class OrderEntity
     public long Id { get; set; }               // ID do pedido
     public string Number { get; set; }         // Número do pedido
     public DateTime? Date { get; set; }        // Data do pedido (pode ser nula)
+   
     public long CustomerId { get; set; }       // Chave estrangeira para o cliente
     public decimal TotalAmount { get; set; }   // Valor total do pedido
     
     // Relacionamento com o cliente
     public CustomerEntity Customer { get; set; }
-    
     
     // Relacionamento com os itens do pedido
     public List<OrderItemEntity> OrderItems { get; set; } = new List<OrderItemEntity>();

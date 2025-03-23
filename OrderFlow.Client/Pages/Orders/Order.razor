@@ -25,13 +25,13 @@
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Numero">@context.Numero</MudTd>
-            <MudTd DataLabel="Nome">@context.Cliente.Name</MudTd>
-            <MudTd DataLabel="Valor">@context.ValorTotal</MudTd>
-            <MudTd DataLabel="Data">@context.Data</MudTd>
+            <MudTd DataLabel="Numero">@context.Number</MudTd>
+            <MudTd DataLabel="Nome">@context.Customer.Name</MudTd>
+            <MudTd DataLabel="Valor">@context.TotalValue</MudTd>
+            <MudTd DataLabel="Data">@context.Date</MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
-                           OnClick="@(() => ViewDetails(context.Numero))">
+                           OnClick="@(() => ViewDetails(context.Number))">
                     Detalhes
                 </MudButton>
             </MudTd>
@@ -63,9 +63,9 @@
         // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
         orders = new List<OrderModel>
         {
-            new OrderModel { Cliente = new CustomerModel("João Silva"), Data = DateTime.Now, Numero = "P1231231", ValorTotal = 330.00m },
-            new OrderModel { Cliente = new CustomerModel("Maria Souza"), Data = DateTime.Now, Numero = "P1231232", ValorTotal = 450.00m },
-            new OrderModel { Cliente = new CustomerModel("José Santos"), Data = DateTime.Now, Numero = "P1231233", ValorTotal = 250.00m },
+            new OrderModel { Customer = new CustomerModel("João Silva"), Date = DateTime.Now, Number = "P1231231", TotalValue = 330.00m },
+            new OrderModel { Customer = new CustomerModel("Maria Souza"), Date = DateTime.Now, Number = "P1231232", TotalValue = 450.00m },
+            new OrderModel { Customer = new CustomerModel("José Santos"), Date = DateTime.Now, Number = "P1231233", TotalValue = 250.00m },
         };
     }
 
@@ -74,10 +74,10 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
 
-        if (element.Cliente.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Customer.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (element.Numero.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Number.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

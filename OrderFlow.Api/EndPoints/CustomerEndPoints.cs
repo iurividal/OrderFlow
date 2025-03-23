@@ -14,7 +14,7 @@ public static class CustomerEndPoints
             var response = await service.GetAllCustomersAsync();
 
             return Results.Ok(response);
-        });
+        }).WithTags("Customers");
         
         // GET /customers/{id}
         app.MapGet("/customers/{id}", async (ICustomerService service, long id) =>
@@ -27,7 +27,7 @@ public static class CustomerEndPoints
             }
 
             return Results.Ok(response);
-        });
+        }).WithTags("Customers");
         
         // POST /customers
         app.MapPost("/customers", async (ICustomerService service, CustomerModel customer) =>
@@ -35,7 +35,7 @@ public static class CustomerEndPoints
             var response = await service.CreateCustomerAsync(customer);
 
             return Results.Created($"/customers/{response}", response);
-        });
+        }).WithTags("Customers");
         
         // DELETE /customers/{id}
         app.MapDelete("/customers/{id}", async (ICustomerService service, long id) =>
@@ -48,7 +48,7 @@ public static class CustomerEndPoints
             }
 
             return Results.NoContent();
-        });
+        }).WithTags("Customers");
 
         return app;
     }
