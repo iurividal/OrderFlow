@@ -29,6 +29,19 @@ public static class CustomerEndPoints
             return Results.Ok(response);
         }).WithTags("Customers");
         
+        //GET /customers/{name}
+        app.MapGet("/customers/{name}", async (ICustomerService service, string name) =>
+        {
+            var response = await service.GetCustomerByNameAsync(name);
+
+            if (response is null)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Ok(response);
+        }).WithTags("Customers");
+        
         // POST /customers
         app.MapPost("/customers", async (ICustomerService service, CustomerModel customer) =>
         {

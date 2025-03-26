@@ -18,6 +18,17 @@ builder.Services.AddHttpClient<ICustomerService, CustomerService>((sp, client) =
     client.BaseAddress = new Uri(settings.BaseUrl);
 });
 
+builder.Services.AddHttpClient<IProductService, ProductService>((sp, client) =>
+{
+    var settings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+    client.BaseAddress = new Uri(settings.BaseUrl);
+});
+
+builder.Services.AddHttpClient<IOrderService, OrderService>((sp, client) =>
+{
+    var settings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+    client.BaseAddress = new Uri(settings.BaseUrl);
+});
 
 builder.Services.AddMudServices();
 await builder.Build().RunAsync();

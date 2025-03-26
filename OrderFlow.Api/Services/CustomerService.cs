@@ -12,6 +12,8 @@ public interface ICustomerService
     Task<long> CreateCustomerAsync(CustomerModel customer);
     Task<bool> UpdateCustomerAsync(CustomerModel customer);
     Task<bool> DeleteCustomerAsync(long customerId);
+
+    Task<CustomerModel> GetCustomerByNameAsync(string name);
 }
 
 public class CustomerService : ICustomerService
@@ -31,9 +33,16 @@ public class CustomerService : ICustomerService
         return customer == null ? null : _mapper.Map<CustomerModel>(customer);
     }
 
+
     public async Task<IEnumerable<CustomerModel>> GetAllCustomersAsync()
     {
         var customer = _mapper.Map<IEnumerable<CustomerModel>>(await _customerRepository.GetAllCustomersAsync());
+        return customer;
+    }
+
+    public async Task<CustomerModel> GetCustomerByNameAsync(string name)
+    {
+        var customer = _mapper.Map<CustomerModel>(await _customerRepository.GetCustomerByNameAsync(name));
         return customer;
     }
 

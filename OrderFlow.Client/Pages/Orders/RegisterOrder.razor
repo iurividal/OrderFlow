@@ -227,6 +227,7 @@
             return;
 
         clientesEncontrados.Clear();
+        
         var termo = termoBuscaCliente.ToLower();
 
         if (clientes.Any(c => c.Name.ToLower().Contains(termo)))

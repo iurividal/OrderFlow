@@ -1,7 +1,9 @@
 ﻿@page "/cadastro-produto"
 @using System.ComponentModel.DataAnnotations
+@using OrderFlow.Client.Services
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
+@inject IProductService _productService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-6">
     <MudCard Elevation="3">
@@ -15,24 +17,25 @@
             <MudCardContent>
                 <MudGrid>
                     <MudItem xs="12" md="4">
-                        <MudTextField @bind-Value="produto.Codigo" Label="Código" Required="true"
-                            RequiredError="Código é obrigatório" Variant="Variant.Outlined" />
+                        <MudTextField @bind-Value="produto.Code" Label="Código" Required="true"
+                                      RequiredError="Código é obrigatório" Variant="Variant.Outlined"/>
                     </MudItem>
-                    
+
                     <MudItem xs="12" md="8">
-                        <MudTextField @bind-Value="produto.Nome" Label="Nome" Required="true" 
-                            RequiredError="Nome é obrigatório" Variant="Variant.Outlined" />
+                        <MudTextField @bind-Value="produto.Name" Label="Nome" Required="true"
+                                      RequiredError="Nome é obrigatório" Variant="Variant.Outlined"/>
                     </MudItem>
-                    
+
                     <MudItem xs="12" md="6">
-                        <MudNumericField @bind-Value="produto.Preco" Label="Preço" Required="true"
-                            RequiredError="Preço é obrigatório" Variant="Variant.Outlined"
-                            Format="N2" Min="0" Adornment="Adornment.Start" AdornmentText="R$" />
+                        <MudNumericField @bind-Value="produto.Price" Label="Preço" Required="true"
+                                         RequiredError="Preço é obrigatório" Variant="Variant.Outlined"
+                                         Format="N2" Min="0" Adornment="Adornment.Start" AdornmentText="R$"/>
                     </MudItem>
-                    
+
                     <MudItem xs="12" md="6">
-                        <MudSelect @bind-Value="produto.TipoMedida" Label="Tipo de Medida" Required="true"
-                            RequiredError="Tipo de medida é obrigatório" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelect @bind-Value="produto.UnitType" Label="Tipo de Medida" Required="true"
+                                   RequiredError="Tipo de medida é obrigatório" Variant="Variant.Outlined"
+                                   AnchorOrigin="Origin.BottomCenter">
                             <MudSelectItem Value="@("Unidade")">Unidade</MudSelectItem>
                             <MudSelectItem Value="@("Kg")">Quilo (Kg)</MudSelectItem>
                             <MudSelectItem Value="@("g")">Grama (g)</MudSelectItem>
@@ -44,40 +47,41 @@
                             <MudSelectItem Value="@("Caixa")">Caixa</MudSelectItem>
                         </MudSelect>
                     </MudItem>
-                    
+
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="produto.Descricao" Label="Descrição" 
-                            Variant="Variant.Outlined" Lines="3" />
+                        <MudTextField @bind-Value="produto.Description" Label="Descrição"
+                                      Variant="Variant.Outlined" Lines="3"/>
                     </MudItem>
-                    
+
                     <MudItem xs="12" md="6">
-                        <MudNumericField @bind-Value="produto.EstoqueMinimo" Label="Estoque Mínimo"
-                            Variant="Variant.Outlined" Min="0" />
+                        <MudNumericField @bind-Value="produto.MinimumStock" Label="Estoque Mínimo"
+                                         Variant="Variant.Outlined" Min="0"/>
                     </MudItem>
-                    
+
                     <MudItem xs="12" md="6">
-                        <MudNumericField @bind-Value="produto.EstoqueAtual" Label="Estoque Atual"
-                            Variant="Variant.Outlined" Min="0" />
+                        <MudNumericField @bind-Value="produto.Stock" Label="Estoque Atual"
+                                         Variant="Variant.Outlined" Min="0"/>
                     </MudItem>
-                    
+
                     <MudItem xs="12">
-                        <MudCheckBox T="bool" @bind-Checked="produto.Ativo" Label="Produto Ativo" Color="Color.Primary" />
+                        <MudCheckBox T="bool" @bind-Checked="produto.Active" Label="Produto Ativo"
+                                     Color="Color.Primary"/>
                     </MudItem>
                 </MudGrid>
             </MudCardContent>
-            
+
             <MudCardActions Class="pa-4 justify-space-between">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" 
-                          OnClick="@(() => NavigationManager.NavigateTo("/produtos"))">
+                <MudButton Variant="Variant.Filled" Color="Color.Error"
+                           OnClick="@(() => NavigationManager.NavigateTo("/produtos"))">
                     Cancelar
                 </MudButton>
                 <div>
                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mr-2"
-                              OnClick="@(()=>form.ResetAsync())">
+                               OnClick="@(() => form.ResetAsync())">
                         Limpar
                     </MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" 
-                              Disabled="@(!success)" OnClick="SalvarProduto">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                               Disabled="@(!success)" OnClick="SalvarProduto">
                         Salvar
                     </MudButton>
                 </div>
@@ -90,64 +94,39 @@
     private MudForm form;
     private bool success;
     private string[] errors = { };
+
+    ProductModel produto = new ProductModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Init();
+    }
     
-    private Produto produto = new Produto 
-    { 
-        Ativo = true, 
-        TipoMedida = "Unidade",
-        DataCadastro = DateTime.Now
-    };
-    
+    private void Init()
+    {
+        produto = new ProductModel
+        {
+            Active = true,
+            UnitType = "Unidade",
+            CreatedAt = DateTime.Now
+        };
+    }
+
     private async Task SalvarProduto()
     {
         await form.Validate();
-        
+
         if (success)
         {
-            // Aqui você implementaria a lógica de persistência
-            // Por exemplo, chamada a um service para salvar no banco de dados
-            
-            // Simulação de salvamento bem-sucedido
-            Snackbar.Add($"Produto {produto.Nome} salvo com sucesso!", Severity.Success);
-            
-            // Reset do formulário ou navegação para a lista
-            produto = new Produto
-            { 
-                Ativo = true, 
-                TipoMedida = "Unidade",
-                DataCadastro = DateTime.Now
-            };
-            
-            // Opcional: redirecionar para a lista de produtos
-            // NavigationManager.NavigateTo("/produtos");
+            await _productService.CreateProductAsync(produto);
+
+            Snackbar.Add($"Produto {produto.Name} salvo com sucesso!", Severity.Success);
+
+            Init();
+           
+            NavigationManager.NavigateTo("/produtos");
         }
     }
-    
-    public class Produto
-    {
-        [Required(ErrorMessage = "O código é obrigatório")]
-        public string Codigo { get; set; }
-        
-        [Required(ErrorMessage = "O nome é obrigatório")]
-        public string Nome { get; set; }
-        
-        [Required(ErrorMessage = "O preço é obrigatório")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "O preço deve ser maior que zero")]
-        public decimal Preco { get; set; }
-        
-        [Required(ErrorMessage = "O tipo de medida é obrigatório")]
-        public string TipoMedida { get; set; }
-        
-        public string Descricao { get; set; }
-        
-        public int EstoqueMinimo { get; set; } = 0;
-        
-        public int EstoqueAtual { get; set; } = 0;
-        
-        public bool Ativo { get; set; } = true;
-        
-        public DateTime DataCadastro { get; set; }
-        
-        public DateTime? DataAtualizacao { get; set; }
-    }
+
+
 }

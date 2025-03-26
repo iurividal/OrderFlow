@@ -10,29 +10,35 @@ public interface ICustomerRepository
     Task<long> CreateCustomerAsync(CustomerEntity customer);
     Task<bool> UpdateCustomerAsync(CustomerEntity customer);
     Task<bool> DeleteCustomerAsync(long customerId);
+
+    Task<CustomerEntity> GetCustomerByNameAsync(string name);
 }
 
 public class CustomerRepository : ICustomerRepository
 {
     private readonly IDbConnectionFactory _connectionFactory;
+
     public CustomerRepository(IDbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
-    
+
     // Obter um cliente por ID
     public async Task<CustomerEntity> GetCustomerByIdAsync(long customerId)
     {
         using var connection = _connectionFactory.CreateConnection();
         var query = "SELECT * FROM customers WHERE Id = @Id";
         var customer = await connection.QueryFirstOrDefaultAsync<CustomerEntity>(query, new { Id = customerId });
-        
-        if(customer != null)
-            customer.Address = await connection.QueryFirstOrDefaultAsync<List<AddressEntity>>("Select * from addresses where CustomerId = @Id", new { Id = customerId });
-        
-        
+
+        if (customer != null)
+            customer.Address =
+                await connection.QueryFirstOrDefaultAsync<List<AddressEntity>>(
+                    "Select * from addresses where CustomerId = @Id", new { Id = customerId });
+
+
         return customer;
     }
+
     // Obter todos os clientes
     public async Task<IEnumerable<CustomerEntity>> GetAllCustomersAsync()
     {
@@ -48,10 +54,28 @@ public class CustomerRepository : ICustomerRepository
                     new { Id = customer.Id }).ToList();
             }
         }
-        
+
         return customers;
     }
-    
+
+    //OBter um cliente que contain o nome
+    public async Task<CustomerEntity> GetCustomerByNameAsync(string name)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var query = "SELECT * FROM customers WHERE Name ILIKE  @Name";
+        var customer =
+            await connection.QueryFirstOrDefaultAsync<CustomerEntity>(query, new { Name = "%" + name + "%" });
+
+        if (customer != null)
+            customer.Address =
+                await connection.QueryFirstOrDefaultAsync<List<AddressEntity>>(
+                    "Select * from addresses where CustomerId = @Id", new { Id = customer.Id });
+
+
+        return customer;
+    }
+
+
     // Criar um novo cliente
     public async Task<long> CreateCustomerAsync(CustomerEntity customer)
     {
@@ -61,7 +85,7 @@ public class CustomerRepository : ICustomerRepository
             VALUES (@Name, @Email, @Phone, @DocumentId, @CreatedAt)
             RETURNING Id";
         var customerId = await connection.ExecuteScalarAsync<long>(query, customer);
-        
+
         // Inserir os endereços do cliente
         foreach (var address in customer.Address)
         {
@@ -78,15 +102,13 @@ public class CustomerRepository : ICustomerRepository
                 address.State,
                 address.ZipCode,
                 AddressType = address.AddressType,
-                
-                
             });
         }
-        
-     
+
+
         return customerId;
     }
-    
+
     // Atualizar um cliente
     public async Task<bool> UpdateCustomerAsync(CustomerEntity customer)
     {
@@ -98,7 +120,7 @@ public class CustomerRepository : ICustomerRepository
         var rowsAffected = await connection.ExecuteAsync(query, customer);
         return rowsAffected > 0;
     }
-    
+
     // Deletar um cliente
     public async Task<bool> DeleteCustomerAsync(long customerId)
     {

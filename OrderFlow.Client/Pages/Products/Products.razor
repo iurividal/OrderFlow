@@ -1,6 +1,8 @@
 ﻿@page "/produtos"
+@using OrderFlow.Client.Services
 
 @inject NavigationManager NavigationManager
+@inject IProductService _productService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <MudText Typo="Typo.h4" Class="mb-4">Produtos</MudText>
@@ -32,6 +34,7 @@
                            OnClick="@(() => ViewDetails(context.Code))">
                     Detalhes
                 </MudButton>
+                
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -56,15 +59,9 @@
     private string searchString = "";
     private List<ProductModel> produtos = new List<ProductModel>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
-        produtos = new List<ProductModel>
-        {
-            new ProductModel { Id = 1, Code = "P01", Name = "Produto 1", Price = 10.0m, Stock = 10 },
-            new ProductModel { Id = 2, Code = "P02", Name = "Produto 2", Price = 20.0m, Stock = 20 },
-            new ProductModel { Id = 3, Code = "P03", Name = "Produto 3", Price = 30.0m, Stock = 30 },
-        };
+        produtos = await _productService.GetProductsAsync();
     }
 
     private bool FilterFunc(ProductModel element)
@@ -80,6 +77,7 @@
 
         return false;
     }
+
 
     private void ViewDetails(string id)
     {
