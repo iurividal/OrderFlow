@@ -11,9 +11,13 @@ public interface IOrderService
 
     Task<OrderModel> GetOrderByIdAsync(long orderId);
 
+    Task<OrderModel> GetOrderByNumberAsync(string orderNumber);
+
     Task<long> CreateOrderAsync(OrderModel order);
 
     Task<bool> UpdateOrderAsync(OrderModel order);
+
+    Task<bool> UpdatePaymentOrderAsync(OrderModel order);
 
     Task<bool> DeleteOrderAsync(long orderId);
 }
@@ -41,6 +45,13 @@ public class OrderService : IOrderService
         return order == null ? null : _mapper.Map<OrderModel>(order);
     }
 
+
+    public async Task<OrderModel> GetOrderByNumberAsync(string orderNumber)
+    {
+        var order = await _orderRepository.GetOrderByNumberAsync(orderNumber);
+        return order == null ? null : _mapper.Map<OrderModel>(order);
+    }
+
     public async Task<long> CreateOrderAsync(OrderModel order)
     {
         var orderEntity = _mapper.Map<OrderEntity>(order);
@@ -51,6 +62,12 @@ public class OrderService : IOrderService
     {
         var orderEntity = _mapper.Map<OrderEntity>(order);
         return await _orderRepository.UpdateOrderAsync(orderEntity);
+    }
+
+    public Task<bool> UpdatePaymentOrderAsync(OrderModel order)
+    {
+        var orderEntity = _mapper.Map<OrderEntity>(order);
+        return _orderRepository.UpdatePaymentOrderAsync(orderEntity);
     }
 
     public async Task<bool> DeleteOrderAsync(long orderId)

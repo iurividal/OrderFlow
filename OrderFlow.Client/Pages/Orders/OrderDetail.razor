@@ -1,0 +1,190 @@
+﻿@page "/order-detail/{OrderNumber}"
+@using OrderFlow.Client.Services
+@inject NavigationManager NavigationManager
+@inject IOrderService OrderService
+@inject ISnackbar Snackbar
+
+
+@if (_order != null)
+{
+    <div class="m-2">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h5">Detalhes do Pedido #@_order.Number</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudChip T="string" Color="@GetStatusColor()" Variant="Variant.Filled">
+                        @_order.Payment.PaymentStatus
+                    </MudChip>
+                </CardHeaderActions>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.subtitle1"><strong>Informações do Pedido</strong></MudText>
+                        <MudList T="string">
+                            <MudListItem>
+                                <MudText>Número do Pedido: @_order.Number</MudText>
+                            </MudListItem>
+                            <MudListItem>
+                                <MudText>Data: @_order.Date?.ToString("dd/MM/yyyy HH:mm")</MudText>
+                            </MudListItem>
+                            <MudListItem>
+                                <MudText>Valor Total: @_order.TotalValue.ToString("C2")</MudText>
+                            </MudListItem>
+                        </MudList>
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.subtitle1"><strong>Informações do Cliente</strong></MudText>
+                        <MudList T="string">
+                            <MudListItem>
+                                <MudText>Nome: @_order.Customer.Name</MudText>
+                            </MudListItem>
+                            <MudListItem>
+                                <MudText>Telefone: @_order.Customer.Phone</MudText>
+                            </MudListItem>
+                            <MudListItem>
+                                <MudText>Email: @_order.Customer.Email</MudText>
+                            </MudListItem>
+                        </MudList>
+                    </MudItem>
+
+
+                    <MudItem xs="12">
+                        <MudExpansionPanels>
+                            <MudExpansionPanel>
+                                <TitleContent>
+                                    <MudText Typo="Typo.subtitle1"><strong>Itens do Pedido</strong></MudText>
+                                </TitleContent>
+                                <ChildContent>
+
+                                    <MudTable Items="@_order.Items" Hover="true" Striped="true">
+                                        <HeaderContent>
+                                            <MudTh>Produto</MudTh>
+                                            <MudTh>Quantidade</MudTh>
+                                            <MudTh>Valor Unitário</MudTh>
+                                            <MudTh>Subtotal</MudTh>
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd>@context.Name</MudTd>
+                                            <MudTd>@context.Quantity</MudTd>
+                                            <MudTd>@(context.Price.ToString("C2"))</MudTd>
+                                            <MudTd>@((context.Quantity * context.Price).ToString("C2"))</MudTd>
+                                        </RowTemplate>
+                                    </MudTable>
+                                </ChildContent>
+                            </MudExpansionPanel>
+                        </MudExpansionPanels>
+                    </MudItem>
+
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.subtitle1"><strong>Informações de Pagamento</strong></MudText>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSelect T="string"
+                                           Label="Status de Pagamento"
+                                           AnchorOrigin="Origin.BottomCenter"
+                                           @bind-Value="_order.Payment.PaymentStatus">
+                                    <MudSelectItem Value="@("Pendente")">Pendente</MudSelectItem>
+                                    <MudSelectItem Value="@("Pago")">Pago</MudSelectItem>
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudSelect T="string"
+                                           Label="Método de Pagamento"
+                                           AnchorOrigin="Origin.BottomCenter"
+                                           @bind-Value="_order.Payment.PaymentMethod">
+                                    <MudSelectItem Value="@("PIX")">PIX</MudSelectItem>
+                                    <MudSelectItem Value="@("Dinheiro")">Dinheiro</MudSelectItem>
+                                    <MudSelectItem Value="@("Cartão de Crédito")">Cartão de Crédito</MudSelectItem>
+                                    <MudSelectItem Value="@("Cartão de Débito")">Cartão de Débito</MudSelectItem>
+                                    <MudSelectItem Value="@("Boleto")">Boleto</MudSelectItem>
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudDatePicker Editable="true" DateFormat="dd/MM/yyyy" Label="Data de Pagamento"
+                                               @bind-Date="_order.Payment.DatePayment"></MudDatePicker>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+
+            <MudCardActions Class="d-inline-flex pa-4">
+                <MudButton
+                    Color="Color.Primary"
+                    Variant="Variant.Filled"
+                    OnClick="@(() => Save())">
+                    Salvar
+                </MudButton>
+                
+                <MudButton
+                    Color="Color.Secondary"
+                    Variant="Variant.Outlined"
+                    OnClick="NavigateBack">
+                    Voltar
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </div>
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+}
+
+
+@code {
+    [Parameter] public string OrderNumber { get; set; }
+
+    private OrderModel _order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Carregar detalhes do pedido
+
+
+            _order = await OrderService.GetOrderByNumberAsync(OrderNumber);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao carregar pedido: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            // Salvar alterações
+            _order.Payment.IsPaid = _order.Payment.PaymentStatus == "Pago";
+            var response = await OrderService.UpdatePaymentOrderAsync(_order);
+
+            if (response)
+                Snackbar.Add("Pagamento atualizado com sucesso", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao salvar pedido: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void NavigateBack()
+    {
+        // Voltar para lista de pedidos
+        NavigationManager.NavigateTo("/pedidos");
+    }
+
+    private Color GetStatusColor()
+    {
+        // Cor do status de pagamento
+        return _order.Payment.IsPaid ? Color.Success : Color.Error;
+    }
+
+}

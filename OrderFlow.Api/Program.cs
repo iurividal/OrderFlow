@@ -29,6 +29,13 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowCredentials(); // Se você estiver enviando cookies/autenticação
     });
+
+    // options.AddPolicy("AllowAll", policy =>
+    // {
+    //     policy.AllowAnyOrigin() // URL do seu Blazor WASM
+    //         .AllowAnyMethod()
+    //         .AllowAnyHeader();
+    // });
 });
 
 var app = builder.Build();

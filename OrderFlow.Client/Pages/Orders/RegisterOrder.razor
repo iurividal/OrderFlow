@@ -230,6 +230,7 @@
             return;
 
         produtosEncontrados.Clear();
+        
         var termo = termoBuscaProduto.ToLower();
 
         produtosEncontrados = await _productService.GetProductByCodeOrNameAsync(termo);
@@ -300,11 +301,7 @@
 
             await _orderService.CreateOrderAsync(pedido);
 
-           
-
             Snackbar.Add("Pedido finalizado com sucesso!", Severity.Success);
-            
-            await ImprimirPedido();
             
             NavigationManager.NavigateTo("/pedidos");
         }
@@ -316,8 +313,6 @@
 
     private async Task ImprimirPedido()
     {
-        // Esta implementação usa JavaScript para abrir uma janela de impressão
-        // Na aplicação real, poderia gerar um relatório PDF ou outro formato
         await JSRuntime.InvokeVoidAsync("imprimirPedido", pedido, itensPedido);
     }
 

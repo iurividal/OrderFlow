@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using OrderFlow.Shared;
 
 namespace OrderFlow.Client.Services;
@@ -9,11 +10,15 @@ public interface IOrderService
 
     Task<OrderModel> GetOrderByIdAsync(long id);
 
+    Task<OrderModel> GetOrderByNumberAsync(string number);
+
     Task<long> CreateOrderAsync(OrderModel order);
 
     Task<bool> DeleteOrderAsync(long id);
 
     Task UpdateOrderAsync(OrderModel order);
+
+    Task<bool> UpdatePaymentOrderAsync(OrderModel order);
 }
 
 public class OrderService : IOrderService
@@ -33,6 +38,12 @@ public class OrderService : IOrderService
     public async Task<OrderModel> GetOrderByIdAsync(long id)
     {
         return await _httpClient.GetFromJsonAsync<OrderModel>($"/orders/{id}");
+    }
+
+    //Get Order by Number
+    public async Task<OrderModel> GetOrderByNumberAsync(string number)
+    {
+        return await _httpClient.GetFromJsonAsync<OrderModel>($"/orders/ord-{number}");
     }
 
     public async Task<long> CreateOrderAsync(OrderModel order)
@@ -59,5 +70,12 @@ public class OrderService : IOrderService
     {
         var response = await _httpClient.PutAsJsonAsync($"/orders/{order.Number}", order);
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<bool> UpdatePaymentOrderAsync(OrderModel order)
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(order);
+        var response = await _httpClient.PutAsJsonAsync($"/orders/payment", order);
+        return response.IsSuccessStatusCode;
     }
 }

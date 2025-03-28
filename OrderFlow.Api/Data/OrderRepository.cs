@@ -7,8 +7,11 @@ namespace OrderFlow.Api.Data;
 public interface IOrderRepository
 {
     Task<OrderEntity> GetOrderByIdAsync(long orderId);
+
+    Task<OrderEntity> GetOrderByNumberAsync(string orderNumber);
     Task<long> CreateOrderAsync(OrderEntity order);
     Task<bool> UpdateOrderAsync(OrderEntity order);
+    Task<bool> UpdatePaymentOrderAsync(OrderEntity order);
     Task<bool> DeleteOrderAsync(long orderId);
     Task<IEnumerable<OrderEntity>> GetAllOrdersAsync();
 }
@@ -27,6 +30,7 @@ public class OrderRepository : IOrderRepository
         _dbConnectionFactory = dbConnectionFactory;
         _customerRepository = customerRepository;
         _productRepository = productRepository;
+      
     }
 
     // Método para obter um pedido por ID
@@ -41,6 +45,26 @@ public class OrderRepository : IOrderRepository
         {
             var itemsQuery = "SELECT * FROM order_items WHERE OrderId = @OrderId";
             order.OrderItems = (await connection.QueryAsync<OrderItemEntity>(itemsQuery, new { OrderId = orderId }))
+                .AsList();
+        }
+
+        return order;
+    }
+
+    // Método para obter um pedido por número
+    public async Task<OrderEntity> GetOrderByNumberAsync(string orderNumber)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        var orderQuery = "SELECT * FROM orders WHERE Number = @Number";
+        var order = await connection.QueryFirstOrDefaultAsync<OrderEntity>(orderQuery, new { Number = orderNumber });
+
+        if (order != null)
+        {
+            order.Customer = await _customerRepository.GetCustomerByIdAsync(order.CustomerId);
+
+            var itemsQuery = "SELECT * FROM order_items WHERE OrderId = @OrderId";
+            order.OrderItems = (await connection.QueryAsync<OrderItemEntity>(itemsQuery, new { OrderId = order.Id }))
                 .AsList();
         }
 
@@ -72,6 +96,21 @@ public class OrderRepository : IOrderRepository
         return orderId;
     }
 
+    //Atualizar pagamento do pedido
+    public async Task<bool> UpdatePaymentOrderAsync(OrderEntity order)
+    {
+        var connection = _dbConnectionFactory.CreateConnection();
+
+        var orderQuery = @"
+                UPDATE orders
+                SET payment_method = @Payment_Method, is_paid = @Is_Paid, date_payment = @Date_Payment
+                WHERE Number = @Number";
+
+        var rowsAffected = await connection.ExecuteAsync(orderQuery, order);
+
+        return rowsAffected > 0;
+    }
+
     // Método para atualizar um pedido
     public async Task<bool> UpdateOrderAsync(OrderEntity order)
     {
@@ -79,9 +118,8 @@ public class OrderRepository : IOrderRepository
 
         var orderQuery = @"
                 UPDATE orders
-                SET Number = @Number, Date = @Date, CustomerId = @CustomerId, TotalAmount = @TotalAmount
+                SET CustomerId = @CustomerId, TotalAmount = @TotalAmount
                 WHERE Id = @Id";
-
 
         var rowsAffected = await connection.ExecuteAsync(orderQuery, order);
 
