@@ -12,6 +12,9 @@ public class CustomerModel
     public string DocumentId { get; set; }
 
     public DateTime CreatedAt { get; set; }
+    
+    public string? ProfileImageUrl { get; set; }
+    
     public List<AddressModel> Address { get; set; } = new();
 
     public CustomerModel()

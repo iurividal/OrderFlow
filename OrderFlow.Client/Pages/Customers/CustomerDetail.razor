@@ -1,0 +1,280 @@
+﻿@page "/customer-detail/{CustomerId:int}"
+@using OrderFlow.Client.Services
+@inject ICustomerService CustomerService
+@inject IOrderService OrderService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5">Detalhes do Cliente</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="12" md="3">
+                <MudPaper Elevation="0" Class="d-flex flex-column align-center">
+                    <MudAvatar Image="@_customerModel.ProfileImageUrl"
+                               Style="height:200px; width:200px;"
+                               Class="mb-4"/>
+
+                    <MudFileUpload T="IBrowserFile"
+                                   Accept=".jpg, .jpeg, .png"
+                    >
+                        <UploadContent>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.CloudUpload">
+                                Alterar Foto
+                            </MudButton>
+                        </UploadContent>
+                    </MudFileUpload>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" md="9">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField
+                            @bind-Value="_customerModel.Name"
+                            Label="Nome Completo"
+                            Variant="Variant.Outlined"/>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField
+                            @bind-Value="_customerModel.Email"
+                            Label="Email"
+                            Variant="Variant.Outlined"/>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField
+                            @bind-Value="_customerModel.Phone"
+                            Label="Telefone"
+                            Variant="Variant.Outlined"/>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField
+                            @bind-Value="_customerModel.DocumentId"
+                            Label="CPF/CNPJ"
+                            Variant="Variant.Outlined"/>
+                    </MudItem>
+                </MudGrid>
+
+                @foreach (var Address in _customerModel.Address)
+                {
+                    <MudExpansionPanels>
+                        <MudExpansionPanel>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Endereço - @Address.AddressType Id: @Address.Id</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudGrid Class="mt-4">
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField
+                                            @bind-Value="@Address.ZipCode"
+                                            Label="CEP"
+                                            Variant="Variant.Outlined"/>
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField
+                                            @bind-Value="Address.Street"
+                                            Label="Rua"
+                                            Variant="Variant.Outlined"/>
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudTextField
+                                            @bind-Value="Address.Number"
+                                            Label="Número"
+                                            Variant="Variant.Outlined"/>
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudTextField
+                                            @bind-Value="Address.Neighborhood"
+                                            Label="Bairro"
+                                            Variant="Variant.Outlined"/>
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudTextField
+                                            @bind-Value="Address.City"
+                                            Label="Cidade"
+                                            Variant="Variant.Outlined"/>
+                                    </MudItem>
+                                    <MudItem xs="12" sm="6">
+                                        <MudSelect T="string" @bind-Value="@(Address.AddressType)"
+                                                   Label="Tipo de Endereço"
+                                                   Required="true">
+                                            @foreach (var type in Enum.GetValues(typeof(TypeAddress)))
+                                            {
+                                                <MudSelectItem Value="@(type.ToString())">@type</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudButton OnClick="@(() => RemoveAddress(Address))" Variant="Variant.Filled"
+                                               Color="Color.Error" Class="mt-4">
+                                        Remover Endereço
+                                    </MudButton>
+                                </MudGrid>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    </MudExpansionPanels>
+                }
+
+
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-6"/>
+
+        <MudText Typo="Typo.h6" Class="mb-4">Histórico de Pedidos</MudText>
+        <MudTable Items="@_customerOrders"
+                  Hover="true"
+                  Striped="true">
+            <HeaderContent>
+                <MudTh>Número do Pedido</MudTh>
+                <MudTh>Data</MudTh>
+                <MudTh>Valor Total</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Ações</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Number</MudTd>
+                <MudTd>@context.Date.Value.ToString("dd/MM/yyyy")</MudTd>
+                <MudTd>@context.TotalValue.ToString("C2")</MudTd>
+                <MudTd>
+                    <MudChip T="string" Color="@GetOrderStatusColor(context.Payment.PaymentStatus)">
+                        @context.Payment.PaymentStatus
+                    </MudChip>
+                </MudTd>
+                <MudTd>
+                    <MudIconButton
+                        Icon="@Icons.Material.Filled.RemoveRedEye"
+                        Color="Color.Primary"
+                        OnClick="() => ViewOrderDetails(context.Number)"/>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+
+    <MudCardActions>
+        <MudButton
+            Color="Color.Primary"
+            Variant="Variant.Filled"
+            OnClick="SaveCustomerChanges">
+            Salvar Alterações
+        </MudButton>
+        <MudButton
+            Color="Color.Secondary"
+            Variant="Variant.Outlined"
+            OnClick="NavigateBack">
+            Cancelar
+        </MudButton>
+    </MudCardActions>
+</MudCard>
+
+
+@code {
+    [Parameter] public int CustomerId { get; set; }
+
+    private CustomerModel _customerModel = new CustomerModel();
+    private List<OrderModel> _customerOrders = new List<OrderModel>();
+    private TypeAddress _typeAddressSelected = TypeAddress.Residencial;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Carregar dados do cliente
+            _customerModel = await CustomerService.GetCustomersByIdAsync(CustomerId);
+
+            // Carregar histórico de pedidos
+            _customerOrders = await OrderService.GetOrdersByCustomerIdAsync(CustomerId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao carregar dados: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task UploadProfileImage(IBrowserFile file)
+    {
+        try
+        {
+            var imageUrl = await CustomerService.UploadProfileImageAsync(file);
+
+
+            _customerModel.ProfileImageUrl = imageUrl;
+            Snackbar.Add("Imagem atualizada com sucesso!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao enviar imagem: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task SearchCEP()
+    {
+        try
+        {
+            // var addressInfo = await CustomerService.SearchAddressByCEPAsync(_customerModel.Address.ZipCode);
+            // if (addressInfo != null)
+            // {
+            //     _customerModel.Address.Street = addressInfo.Street;
+            //     _customerModel.Address.Neighborhood = addressInfo.Neighborhood;
+            //     _customerModel.Address.City = addressInfo.City;
+            // }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao buscar CEP: {ex.Message}", Severity.Warning);
+        }
+    }
+
+    private async Task RemoveAddress(AddressModel address)
+    {
+        _customerModel.Address.Remove(address);
+
+        Snackbar.Add("Endereço removido com sucesso!", Severity.Success);
+
+        StateHasChanged();
+    }
+
+    private async Task SaveCustomerChanges()
+    {
+        try
+        {
+            var response = await CustomerService.UpdateCustomerAsync(_customerModel);
+
+            if (response)
+                Snackbar.Add("Dados atualizados com sucesso!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao salvar: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void ViewOrderDetails(string orderNumber)
+    {
+        NavigationManager.NavigateTo($"/order-detail/{orderNumber}");
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/customers");
+    }
+
+    private Color GetOrderStatusColor(string status)
+    {
+        return status switch
+        {
+            "Concluído" => Color.Success,
+            "Em Andamento" => Color.Warning,
+            "Cancelado" => Color.Error,
+            _ => Color.Default
+        };
+    }
+
+}

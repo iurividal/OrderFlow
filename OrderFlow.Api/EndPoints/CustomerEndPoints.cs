@@ -16,7 +16,7 @@ public static class CustomerEndPoints
 
             return Results.Ok(response);
         }).WithTags("Customers");
-        
+
         // GET /customers/{id}
         app.MapGet("/customers/{id}", async (ICustomerService service, long id) =>
         {
@@ -29,9 +29,9 @@ public static class CustomerEndPoints
 
             return Results.Ok(response);
         }).WithTags("Customers");
-        
+
         //GET /customers/{name}
-        app.MapGet("/customers/filter", async (ICustomerService service,[FromQuery] string name) =>
+        app.MapGet("/customers/filter", async (ICustomerService service, [FromQuery] string name) =>
         {
             var response = await service.GetCustomerByNameAsync(name);
 
@@ -42,7 +42,7 @@ public static class CustomerEndPoints
 
             return Results.Ok(response);
         }).WithTags("Customers");
-        
+
         // POST /customers
         app.MapPost("/customers", async (ICustomerService service, CustomerModel customer) =>
         {
@@ -50,7 +50,34 @@ public static class CustomerEndPoints
 
             return Results.Created($"/customers/{response}", response);
         }).WithTags("Customers");
-        
+
+        // PUT /customers/{id}
+        app.MapPut("/customers/", async (ICustomerService service, CustomerModel customer) =>
+        {
+            var response = await service.UpdateCustomerAsync(customer);
+
+            if (!response)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.NoContent();
+        }).WithTags("Customers");
+
+        // DELETE /customers/address/{id}
+        app.MapDelete("/customers/address/{id}", async (ICustomerService service, long id) =>
+        {
+            var response = await service.DeleteAddressAsync(id);
+
+            if (!response)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.NoContent();
+        }).WithTags("Customers");
+
+
         // DELETE /customers/{id}
         app.MapDelete("/customers/{id}", async (ICustomerService service, long id) =>
         {
@@ -66,6 +93,4 @@ public static class CustomerEndPoints
 
         return app;
     }
-    
-
 }

@@ -13,6 +13,8 @@ public interface IOrderService
 
     Task<OrderModel> GetOrderByNumberAsync(string orderNumber);
 
+    Task<List<OrderModel>> GetOrdersByCustomerIdAsync(int customerId);
+
     Task<long> CreateOrderAsync(OrderModel order);
 
     Task<bool> UpdateOrderAsync(OrderModel order);
@@ -50,6 +52,12 @@ public class OrderService : IOrderService
     {
         var order = await _orderRepository.GetOrderByNumberAsync(orderNumber);
         return order == null ? null : _mapper.Map<OrderModel>(order);
+    }
+    
+    public async Task<List<OrderModel>> GetOrdersByCustomerIdAsync(int customerId)
+    {
+        var orders = await _orderRepository.GetOrdersByCustomerIdAsync(customerId);
+        return orders == null ? null : _mapper.Map(orders, new List<OrderModel>());
     }
 
     public async Task<long> CreateOrderAsync(OrderModel order)

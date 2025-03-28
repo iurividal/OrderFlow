@@ -9,6 +9,7 @@ public interface IOrderRepository
     Task<OrderEntity> GetOrderByIdAsync(long orderId);
 
     Task<OrderEntity> GetOrderByNumberAsync(string orderNumber);
+    Task<IEnumerable<OrderEntity>> GetOrdersByCustomerIdAsync(int customerId);
     Task<long> CreateOrderAsync(OrderEntity order);
     Task<bool> UpdateOrderAsync(OrderEntity order);
     Task<bool> UpdatePaymentOrderAsync(OrderEntity order);
@@ -69,6 +70,27 @@ public class OrderRepository : IOrderRepository
         }
 
         return order;
+    }
+    
+    // Método para obter pedidos por ID do cliente
+   
+    public async Task<IEnumerable<OrderEntity>> GetOrdersByCustomerIdAsync(int customerId)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        var ordersQuery = "SELECT * FROM orders WHERE CustomerId = @CustomerId";
+        var orders = await connection.QueryAsync<OrderEntity>(ordersQuery, new { CustomerId = customerId });
+
+        foreach (var order in orders)
+        {
+           // order.Customer = await _customerRepository.GetCustomerByIdAsync(order.CustomerId);
+
+            var itemsQuery = "SELECT * FROM order_items WHERE OrderId = @OrderId";
+            order.OrderItems = (await connection.QueryAsync<OrderItemEntity>(itemsQuery, new { OrderId = order.Id }))
+                .AsList();
+        }
+
+        return orders;
     }
 
     // Método para criar um novo pedido

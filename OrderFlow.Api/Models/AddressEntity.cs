@@ -5,6 +5,7 @@ namespace OrderFlow.Api.Models;
 public class AddressEntity
 {
     public long Id { get; set; }
+    
 
     public long CustomerId { get; set; }
     

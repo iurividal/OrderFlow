@@ -11,6 +11,8 @@ public interface ICustomerRepository
     Task<bool> UpdateCustomerAsync(CustomerEntity customer);
     Task<bool> DeleteCustomerAsync(long customerId);
 
+    Task<bool> DeleteAddressAsync(long addressId);
+
     Task<IEnumerable<CustomerEntity>> GetCustomerByNameAsync(string name);
 }
 
@@ -121,9 +123,50 @@ public class CustomerRepository : ICustomerRepository
             SET Name = @Name, Email = @Email, Phone = @Phone, DocumentId = @DocumentId
             WHERE Id = @Id";
         var rowsAffected = await connection.ExecuteAsync(query, customer);
+        
+        //verificar quais endereços foram removidos
+        var existingAddresses = await connection.QueryAsync<AddressEntity>("Select * from addresses where CustomerId = @Id",
+            new { Id = customer.Id });
+        var addressesToDelete = existingAddresses.Where(a => !customer.Address.Any(ca => ca.Id == a.Id)).ToList();
+        
+        foreach (var address in addressesToDelete)
+        {
+            var deleteAddressQuery = "DELETE FROM addresses WHERE Id = @Id";
+            await connection.ExecuteAsync(deleteAddressQuery, new { Id = address.Id });
+        }
+        
+        // Atualizar os endereços do cliente
+        foreach (var address in customer.Address)
+        {
+            var addressQuery = @"
+                UPDATE addresses
+                SET Street = @Street, Number = @Number, Neighborhood = @Neighborhood, City = @City, State = @State, ZipCode = @ZipCode
+                WHERE CustomerId = @CustomerId AND AddressType = @AddressType";
+            await connection.ExecuteAsync(addressQuery, new
+            {
+                CustomerId = customer.Id,
+                address.Street,
+                address.Number,
+                address.Neighborhood,
+                address.City,
+                address.State,
+                address.ZipCode,
+                AddressType = address.AddressType,
+            });
+        }
+        
         return rowsAffected > 0;
     }
 
+    //deletar um endereço
+    public async Task<bool> DeleteAddressAsync(long addressId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var query = "DELETE FROM addresses WHERE Id = @Id";
+        var rowsAffected = await connection.ExecuteAsync(query, new { Id = addressId });
+        return rowsAffected > 0;
+    }
+    
     // Deletar um cliente
     public async Task<bool> DeleteCustomerAsync(long customerId)
     {

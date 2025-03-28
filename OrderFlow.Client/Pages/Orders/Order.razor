@@ -23,6 +23,7 @@
             <MudTh>Nome</MudTh>
             <MudTh>Valor</MudTh>
             <MudTh>Data</MudTh>
+            <MudTh>Status</MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -30,6 +31,7 @@
             <MudTd DataLabel="Nome">@context.Customer.Name</MudTd>
             <MudTd DataLabel="Valor">@context.TotalValue</MudTd>
             <MudTd DataLabel="Data">@context.Date</MudTd>
+            <MudTd DataLabel="Status">@context.Payment.PaymentStatus</MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
                            OnClick="@(() => ViewDetails(context.Number))">

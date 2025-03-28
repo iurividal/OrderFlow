@@ -12,6 +12,7 @@ public interface ICustomerService
     Task<long> CreateCustomerAsync(CustomerModel customer);
     Task<bool> UpdateCustomerAsync(CustomerModel customer);
     Task<bool> DeleteCustomerAsync(long customerId);
+    Task<bool> DeleteAddressAsync(long addressId);
 
     Task<IEnumerable<CustomerModel>> GetCustomerByNameAsync(string name);
 }
@@ -65,5 +66,11 @@ public class CustomerService : ICustomerService
     {
         // Realize ações antes de excluir o cliente, se necessário.
         return await _customerRepository.DeleteCustomerAsync(customerId);
+    }
+
+    public async Task<bool> DeleteAddressAsync(long addressId)
+    {
+        // Lógica de validação ou transformação pode ser aplicada antes de chamar o repositório.
+        return await _customerRepository.DeleteAddressAsync(addressId);
     }
 }

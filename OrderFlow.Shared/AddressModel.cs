@@ -3,6 +3,8 @@
 public class AddressModel
 {
     // Properties Adress,Number,Complement,Neighborhood,City,State,ZipCode
+
+    public long Id { get; set; }
     public string Street { get; set; }
     public string Number { get; set; }
     public string Complement { get; set; }

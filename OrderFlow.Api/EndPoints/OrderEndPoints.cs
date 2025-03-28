@@ -40,6 +40,20 @@ public static class OrderEndPoints
 
             return Results.Ok(response);
         }).WithTags("Orders");
+        
+        // GET /orders/customer/{customerId}
+        app.MapGet("/orders/customer/{customerId}", async (IOrderService service, int customerId) =>
+        {
+            var response = await service.GetOrdersByCustomerIdAsync(customerId);
+
+            if (response is null)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Ok(response);
+            
+        }).WithTags("Orders");
 
         // POST /orders
         app.MapPost("/orders", async (IOrderService service, OrderModel order) =>
@@ -56,6 +70,8 @@ public static class OrderEndPoints
 
             return Results.NoContent();
         }).WithTags("Orders");
+        
+        
 
         // DELETE /orders/{id}
         app.MapDelete("/orders/{id}", async (IOrderService service, long id) =>

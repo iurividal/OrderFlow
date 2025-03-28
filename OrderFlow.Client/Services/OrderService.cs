@@ -19,6 +19,8 @@ public interface IOrderService
     Task UpdateOrderAsync(OrderModel order);
 
     Task<bool> UpdatePaymentOrderAsync(OrderModel order);
+    
+    Task<List<OrderModel>> GetOrdersByCustomerIdAsync(int customerId);
 }
 
 public class OrderService : IOrderService
@@ -38,6 +40,11 @@ public class OrderService : IOrderService
     public async Task<OrderModel> GetOrderByIdAsync(long id)
     {
         return await _httpClient.GetFromJsonAsync<OrderModel>($"/orders/{id}");
+    }
+    
+    public async Task<List<OrderModel>> GetOrdersByCustomerIdAsync(int customerId)
+    {
+        return await _httpClient.GetFromJsonAsync<List<OrderModel>>($"/orders/customer/{customerId}");
     }
 
     //Get Order by Number

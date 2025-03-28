@@ -12,8 +12,7 @@ public class AddressMappingProfile : Profile
     {
         //map AdressEntity to Adress
         CreateMap<AddressEntity, AddressModel>()
-
-            //.ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             //.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
             .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Street))
             .ForMember(dest => dest.Number, opt => opt.MapFrom(src => src.Number))
@@ -27,7 +26,7 @@ public class AddressMappingProfile : Profile
 
         //map Adress to AdressEntity
         CreateMap<AddressModel, AddressEntity>()
-            //.ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             //.ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
             .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Street))
             .ForMember(dest => dest.Number, opt => opt.MapFrom(src => src.Number))
