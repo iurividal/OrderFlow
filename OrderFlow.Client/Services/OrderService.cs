@@ -38,7 +38,15 @@ public class OrderService : IOrderService
     public async Task<long> CreateOrderAsync(OrderModel order)
     {
         var response = await _httpClient.PostAsJsonAsync("/orders", order);
-        return await response.Content.ReadFromJsonAsync<long>();
+
+        try
+        {
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(await response.Content.ReadAsStringAsync());
+        }
     }
 
     public async Task<bool> DeleteOrderAsync(long id)

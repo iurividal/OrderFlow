@@ -16,10 +16,17 @@ public interface IOrderRepository
 public class OrderRepository : IOrderRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
+    ICustomerRepository _customerRepository;
+    IProductRepository _productRepository;
 
-    public OrderRepository(IDbConnectionFactory dbConnectionFactory, ILogger<OrderRepository> logger)
+    public OrderRepository(IDbConnectionFactory dbConnectionFactory,
+        ICustomerRepository customerRepository,
+        IProductRepository productRepository,
+        ILogger<OrderRepository> logger)
     {
         _dbConnectionFactory = dbConnectionFactory;
+        _customerRepository = customerRepository;
+        _productRepository = productRepository;
     }
 
     // Método para obter um pedido por ID
@@ -116,9 +123,16 @@ public class OrderRepository : IOrderRepository
 
         foreach (var order in orders)
         {
+            order.Customer = await _customerRepository.GetCustomerByIdAsync(order.CustomerId);
+
             var itemsQuery = "SELECT * FROM order_items WHERE OrderId = @OrderId";
             order.OrderItems = (await connection.QueryAsync<OrderItemEntity>(itemsQuery, new { OrderId = order.Id }))
                 .AsList();
+
+            foreach (var item in order.OrderItems)
+            {
+                item.Product = await _productRepository.GetProductByIdAsync(item.ProductId);
+            }
         }
 
         return orders;

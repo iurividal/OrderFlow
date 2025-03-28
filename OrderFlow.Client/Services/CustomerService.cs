@@ -8,8 +8,8 @@ public interface ICustomerService
     Task<List<CustomerModel>> GetCustomersAsync();
 
     Task AddCustomerAsync(CustomerModel customer);
-    
-    Task<CustomerModel> GetCustomerByNameAsync(string name);
+
+    Task<List<CustomerModel>> GetCustomerByNameAsync(string name);
 }
 
 public class CustomerService : ICustomerService
@@ -26,11 +26,11 @@ public class CustomerService : ICustomerService
     {
         return await _httpClient.GetFromJsonAsync<List<CustomerModel>>(ENDPOINT);
     }
-    
+
     //BUSCAR CLIENTE POR NOME
-    public async Task<CustomerModel> GetCustomerByNameAsync(string name)
+    public async Task<List<CustomerModel>> GetCustomerByNameAsync(string name)
     {
-        return await _httpClient.GetFromJsonAsync<CustomerModel>($"{ENDPOINT}/{name}");
+        return await _httpClient.GetFromJsonAsync<List<CustomerModel>>($"{ENDPOINT}/filter?name={Uri.EscapeDataString(name)}");
     }
 
     // add new Customer
@@ -43,6 +43,4 @@ public class CustomerService : ICustomerService
             throw new Exception("Failed to add customer");
         }
     }
-    
-    
 }

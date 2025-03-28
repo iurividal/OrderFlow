@@ -1,6 +1,7 @@
 ﻿@page "/pedidos"
+@using OrderFlow.Client.Services
 @inject NavigationManager NavigationManager
-
+@inject IOrderService _orderService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <MudText Typo="Typo.h4" Class="mb-4">Pedidos</MudText>
@@ -58,15 +59,9 @@
     private string searchString = "";
     private List<OrderModel> orders = new List<OrderModel>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Dados de exemplo - Na prática, você buscaria estes dados de um serviço/API
-        orders = new List<OrderModel>
-        {
-            new OrderModel { Customer = new CustomerModel("João Silva"), Date = DateTime.Now, Number = "P1231231", TotalValue = 330.00m },
-            new OrderModel { Customer = new CustomerModel("Maria Souza"), Date = DateTime.Now, Number = "P1231232", TotalValue = 450.00m },
-            new OrderModel { Customer = new CustomerModel("José Santos"), Date = DateTime.Now, Number = "P1231233", TotalValue = 250.00m },
-        };
+        orders = await _orderService.GetOrdersAsync();
     }
 
     private bool FilterFunc(OrderModel element)

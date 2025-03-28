@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Services;
 using OrderFlow.Shared;
 
@@ -30,7 +31,7 @@ public static class CustomerEndPoints
         }).WithTags("Customers");
         
         //GET /customers/{name}
-        app.MapGet("/customers/{name}", async (ICustomerService service, string name) =>
+        app.MapGet("/customers/filter", async (ICustomerService service,[FromQuery] string name) =>
         {
             var response = await service.GetCustomerByNameAsync(name);
 

@@ -15,6 +15,8 @@ public interface IProductRepository
     Task<bool> UpdateProductAsync(ProductEntity product);
 
     Task<bool> DeleteProductAsync(long productId);
+
+    Task<IEnumerable<ProductEntity>> GetProductByCodeOrNameAsync(string codeOrName);
 }
 
 public class ProductRepository : IProductRepository
@@ -37,6 +39,14 @@ public class ProductRepository : IProductRepository
         using var connection = _dbConnectionFactory.CreateConnection();
         var query = "SELECT * FROM Products WHERE Id = @Id";
         return await connection.QueryFirstOrDefaultAsync<ProductEntity>(query, new { Id = productId });
+    }
+    
+    //Consulta produto por codigo ou parte do nome
+    public async Task<IEnumerable<ProductEntity>> GetProductByCodeOrNameAsync(string codeOrName)
+    {
+        using var connection = _dbConnectionFactory.CreateConnection();
+        var query = "SELECT * FROM Products WHERE  Code ILIKE  @Code OR Name ILike @Name";
+        return await connection.QueryAsync<ProductEntity>(query, new { Code = $"%{codeOrName}%", Name = $"%{codeOrName}%"});
     }
 
     public async Task<long> CreateProductAsync(ProductEntity product)

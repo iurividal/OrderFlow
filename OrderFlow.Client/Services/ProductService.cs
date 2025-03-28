@@ -10,6 +10,8 @@ public interface IProductService
     Task<long> CreateProductAsync(ProductModel product);
     Task<bool> DeleteProductAsync(long id);
     Task UpdateProductAsync(ProductModel product);
+
+    Task<List<ProductModel>> GetProductByCodeOrNameAsync(string codeOrName);
 }
 
 public class ProductService : IProductService
@@ -37,6 +39,12 @@ public class ProductService : IProductService
         var response = await _httpClient.PostAsJsonAsync(ENDPOINT, product);
      
         return await response.Content.ReadFromJsonAsync<long>();
+    }
+    
+    //BUSCAR PRODUTO POR CODIGO OU PARTE DO NOME
+    public async Task<List<ProductModel>> GetProductByCodeOrNameAsync(string codeOrName)
+    {
+        return await _httpClient.GetFromJsonAsync<List<ProductModel>>($"{ENDPOINT}/filter?codeOrName={Uri.EscapeDataString(codeOrName)}");
     }
 
     public async Task<bool> DeleteProductAsync(long id)

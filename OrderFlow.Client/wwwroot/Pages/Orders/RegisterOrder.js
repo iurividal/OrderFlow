@@ -7,7 +7,7 @@
     var html = `
         <html>
         <head>
-            <title>Pedido ${pedido.numero}</title>
+            <title>Pedido ${pedido.number}</title>
             <style>
                 body { font-family: Arial, sans-serif; margin: 20px; }
                 h1 { text-align: center; }
@@ -19,13 +19,13 @@
             </style>
         </head>
         <body>
-            <h1>Pedido #${pedido.numero}</h1>
+            <h1>Pedido #${pedido.number}</h1>
             
             <div class="info">
                 <p><strong>Data:</strong> ${new Date(pedido.Data).toLocaleDateString()}</p>
-                <p><strong>Cliente:</strong> ${pedido.cliente.name}</p>
-                <p><strong>Endereço:</strong> ${pedido.cliente.adress[0].street} ${pedido.cliente.adress[0].number} - ${pedido.cliente.adress[0].city}</p>
-                <p><strong>Telefone:</strong> ${pedido.cliente.phone}</p>
+                <p><strong>Cliente:</strong> ${pedido.customer.name}</p>
+                <p><strong>Endereço:</strong> ${pedido.customer.address[0].street} ${pedido.customer.address[0].number} - ${pedido.customer.address[0].city}</p>
+                <p><strong>Telefone:</strong> ${pedido.customer.phone}</p>
             </div>
             
             <table>
@@ -44,10 +44,10 @@
     itens.forEach(item => {
         html += `
             <tr>
-                <td>${item.produto.codigo}</td>
-                <td>${item.produto.nome}</td>
-                <td>R$ ${item.precoUnitario.toFixed(2).replace('.', ',')}</td>
-                <td>${item.quantidade}</td>
+                <td>${item.code}</td>
+                <td>${item.name}</td>
+                <td>R$ ${item.price.toFixed(2).replace('.', ',')}</td>
+                <td>${item.Quantity}</td>
                 <td>R$ ${item.subtotal.toFixed(2).replace('.', ',')}</td>
             </tr>
         `;

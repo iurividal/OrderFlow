@@ -16,6 +16,8 @@ public interface IProductService
     Task<bool> UpdateProductAsync(ProductModel product);
 
     Task<bool> DeleteProductAsync(long productId);
+
+    Task<IEnumerable<ProductModel>> GetProductByCodeOrNameAsync(string codeOrName);
 }
 
 public class ProductService : IProductService
@@ -39,6 +41,13 @@ public class ProductService : IProductService
     {
         var product = await _productRepository.GetProductByIdAsync(productId);
         return product == null ? null : _mapper.Map<ProductModel>(product);
+    }
+    
+    //Consulta produto por codigo ou parte do nome
+    public async Task<IEnumerable<ProductModel>> GetProductByCodeOrNameAsync(string codeOrName)
+    {
+        var products = await _productRepository.GetProductByCodeOrNameAsync(codeOrName);
+        return _mapper.Map(products, new List<ProductModel>());
     }
 
     public async Task<long> CreateProductAsync(ProductModel product)

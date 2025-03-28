@@ -1,4 +1,5 @@
-﻿using OrderFlow.Api.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using OrderFlow.Api.Services;
 using OrderFlow.Shared;
 
 namespace OrderFlow.Api.EndPoints;
@@ -26,7 +27,21 @@ public static class ProductEndPoints
             }
 
             return Results.Ok(response);
-        }).WithTags("Products");;
+        }).WithTags("Products");
+        
+
+        app.MapGet("/products/filter", async (IProductService service,[FromQuery] string codeOrName) =>
+        {
+            var response = await service.GetProductByCodeOrNameAsync(codeOrName);
+
+            if (response is null)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Ok(response);
+            
+        }).WithTags("Products");
 
         // POST /products
         app.MapPost("/products", async (IProductService service, ProductModel product) =>

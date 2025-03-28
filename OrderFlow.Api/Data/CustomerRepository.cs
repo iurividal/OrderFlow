@@ -11,7 +11,7 @@ public interface ICustomerRepository
     Task<bool> UpdateCustomerAsync(CustomerEntity customer);
     Task<bool> DeleteCustomerAsync(long customerId);
 
-    Task<CustomerEntity> GetCustomerByNameAsync(string name);
+    Task<IEnumerable<CustomerEntity>> GetCustomerByNameAsync(string name);
 }
 
 public class CustomerRepository : ICustomerRepository
@@ -31,10 +31,10 @@ public class CustomerRepository : ICustomerRepository
         var customer = await connection.QueryFirstOrDefaultAsync<CustomerEntity>(query, new { Id = customerId });
 
         if (customer != null)
-            customer.Address =
-                await connection.QueryFirstOrDefaultAsync<List<AddressEntity>>(
-                    "Select * from addresses where CustomerId = @Id", new { Id = customerId });
-
+        {
+            customer.Address = connection.Query<AddressEntity>("Select * from addresses where CustomerId = @Id",
+                new { Id = customer.Id }).ToList();
+        }
 
         return customer;
     }
@@ -59,20 +59,23 @@ public class CustomerRepository : ICustomerRepository
     }
 
     //OBter um cliente que contain o nome
-    public async Task<CustomerEntity> GetCustomerByNameAsync(string name)
+    public async Task<IEnumerable<CustomerEntity>> GetCustomerByNameAsync(string name)
     {
         using var connection = _connectionFactory.CreateConnection();
         var query = "SELECT * FROM customers WHERE Name ILIKE  @Name";
-        var customer =
-            await connection.QueryFirstOrDefaultAsync<CustomerEntity>(query, new { Name = "%" + name + "%" });
+        var customers =
+            await connection.QueryAsync<CustomerEntity>(query, new { Name = "%" + name + "%" });
 
-        if (customer != null)
-            customer.Address =
-                await connection.QueryFirstOrDefaultAsync<List<AddressEntity>>(
-                    "Select * from addresses where CustomerId = @Id", new { Id = customer.Id });
+        if (customers != null)
+        {
+            foreach (var customer in customers)
+            {
+                customer.Address = connection.Query<AddressEntity>("Select * from addresses where CustomerId = @Id",
+                    new { Id = customer.Id }).ToList();
+            }
+        }
 
-
-        return customer;
+        return customers;
     }
 
 

@@ -1,9 +1,13 @@
 ﻿@page "/cadastro-pedido"
 @using System.Collections.Generic
 @using System.Linq
+@using OrderFlow.Client.Services
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
-
+@inject ICustomerService _customerService
+@inject IProductService _productService
+@inject IOrderService _orderService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <MudText Typo="Typo.h4" Class="mb-4">Cadastro de Pedido</MudText>
@@ -62,12 +66,6 @@
     <MudPaper Class="pa-4 mb-4">
         <MudText Typo="Typo.h6" Class="mb-2">Adicionar Produtos</MudText>
         <MudGrid>
-            <MudItem xs="12" md="4">
-                <MudSelect T="string" Label="Buscar por" @bind-Value="tipoBuscaProduto">
-                    <MudSelectItem Value="@("codigo")">Código</MudSelectItem>
-                    <MudSelectItem Value="@("nome")">Nome</MudSelectItem>
-                </MudSelect>
-            </MudItem>
             <MudItem xs="12" md="8">
                 <MudTextField @bind-Value="termoBuscaProduto" Label="Pesquisar produto" Variant="Variant.Outlined"
                               Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
@@ -138,8 +136,8 @@
                     <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Código">@context.Product.Code</MudTd>
-                    <MudTd DataLabel="Produto">@context.Product.Name</MudTd>
+                    <MudTd DataLabel="Código">@context.Code</MudTd>
+                    <MudTd DataLabel="Produto">@context.Name</MudTd>
                     <MudTd DataLabel="Preço Unit.">@context.Price.ToString("C")</MudTd>
                     <MudTd DataLabel="Quantidade">@context.Quantity</MudTd>
                     <MudTd DataLabel="Subtotal">@context.Subtotal.ToString("C")</MudTd>
@@ -204,44 +202,17 @@
 
     private decimal TotalPedido => itensPedido.Sum(i => i.Subtotal);
 
-    // Dados fictícios para demonstração
-    private List<CustomerModel> clientes = new List<CustomerModel>
-    {
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "João Silva", Phone = "(11) 98765-4321", DocumentId = "123.456.789-01", Address = new List<AddressModel> { new AddressModel { Street = "RUA 1", City = "ITU", Number = "A2", AddressType = "Residencial" } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria Oliveira", Phone = "(11) 91234-5678", DocumentId = "987.654.321-09", Address = new List<AddressModel> { new AddressModel { Street = "RUA 2", City = "ITU", Number = "A3", AddressType = "Residencial" } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Maria José", Phone = "(11) 91234-5678", DocumentId = "222.865.12-09", Address = new List<AddressModel> { new AddressModel { Street = "RUA 3", City = "ITU", Number = "A4", AddressType = "Residencial" } } },
-        new CustomerModel { Id = Guid.NewGuid().ToString(), Name = "Empresa XYZ Ltda", Phone = "(11) 3123-4567", DocumentId = "12.345.678/0001-90", Address = new List<AddressModel> { new AddressModel { Street = "RUA 4", City = "ITU", Number = "A5", AddressType = "Residencial" } } }
-    };
-
-    private List<ProductModel> produtos = new List<ProductModel>
-    {
-        new ProductModel { Id = 1, Code = "P001", Name = "Notebook Dell", Price = 3999.90M, Stock = 10 },
-        new ProductModel { Id = 2, Code = "P002", Name = "Mouse sem fio", Price = 89.90M, Stock = 50 },
-        new ProductModel { Id = 3, Code = "P003", Name = "Teclado Mecânico", Price = 249.90M, Stock = 25 },
-        new ProductModel { Id = 4, Code = "P004", Name = "Monitor 24 polegadas", Price = 899.90M, Stock = 15 }
-    };
-
-    private void BuscarCliente()
+    private async Task BuscarCliente()
     {
         if (string.IsNullOrWhiteSpace(termoBuscaCliente))
             return;
 
         clientesEncontrados.Clear();
-        
-        var termo = termoBuscaCliente.ToLower();
 
-        if (clientes.Any(c => c.Name.ToLower().Contains(termo)))
-            clientesEncontrados = clientes.Where(c => c.Name.ToLower().Contains(termo)).ToList();
-        else if (clientesEncontrados.Any(c => c.Phone.Contains(termo)))
-            clientesEncontrados = clientes.Where(c => c.Phone.Contains(termo)).ToList();
+        clientesEncontrados = await _customerService.GetCustomerByNameAsync(termoBuscaCliente);
 
-        else if (clientes.Any(c => c.DocumentId.Replace(".", "").Replace("-", "").Replace("/", "")
-                     .Contains(termo.Replace(".", "").Replace("-", "").Replace("/", ""))))
-            clientesEncontrados = clientes.Where(c => c.DocumentId.Replace(".", "").Replace("-", "").Replace("/", "")
-                .Contains(termo.Replace(".", "").Replace("-", "").Replace("/", ""))).ToList();
-        else
+        if (!clientesEncontrados.Any())
             Snackbar.Add("Cliente não encontrado.", Severity.Error);
-
 
         StateHasChanged();
     }
@@ -253,7 +224,7 @@
         clientesEncontrados.Clear();
     }
 
-    private void BuscarProduto()
+    private async Task BuscarProduto()
     {
         if (string.IsNullOrWhiteSpace(termoBuscaProduto))
             return;
@@ -261,15 +232,10 @@
         produtosEncontrados.Clear();
         var termo = termoBuscaProduto.ToLower();
 
-        switch (tipoBuscaProduto)
-        {
-            case "codigo":
-                produtosEncontrados = produtos.Where(p => p.Code.ToLower().Contains(termo)).ToList();
-                break;
-            case "nome":
-                produtosEncontrados = produtos.Where(p => p.Name.ToLower().Contains(termo)).ToList();
-                break;
-        }
+        produtosEncontrados = await _productService.GetProductByCodeOrNameAsync(termo);
+
+        if (!produtosEncontrados.Any())
+            Snackbar.Add("Produto não encontrado.", Severity.Error);
 
         StateHasChanged();
     }
@@ -287,7 +253,7 @@
             return;
 
 // Verifica se o produto já existe no pedido
-        var itemExistente = itensPedido.FirstOrDefault(i => i.Product.Id == produtoSelecionado.Id);
+        var itemExistente = itensPedido.FirstOrDefault(i => i.ProdutoId == produtoSelecionado.Id);
 
         if (itemExistente != null)
         {
@@ -300,7 +266,8 @@
 // Adiciona novo item ao pedido
             var novoItem = new ItemOrder
             {
-                Product = produtoSelecionado,
+                ProdutoId = produtoSelecionado.Id,
+                Name = produtoSelecionado.Name,
                 Price = produtoSelecionado.Price,
                 Quantity = quantidadeProduto
             };
@@ -323,16 +290,28 @@
         return clienteSelecionado != null && itensPedido.Any();
     }
 
-    private void FinalizarPedido()
+    private async Task FinalizarPedido()
     {
-// Aqui seria implementada a lógica de persistência do pedido
-        pedido.Items = new List
-            <ItemOrder>(itensPedido);
-        pedido.TotalValue = TotalPedido;
+        try
+        {
+            pedido.Items = new List
+                <ItemOrder>(itensPedido);
+            pedido.TotalValue = TotalPedido;
 
-        // Exibe mensagem de sucesso
-        // Este trecho seria substituído por um serviço de notificação real
-        Console.WriteLine($"Pedido {pedido.Number} finalizado com sucesso!");
+            await _orderService.CreateOrderAsync(pedido);
+
+           
+
+            Snackbar.Add("Pedido finalizado com sucesso!", Severity.Success);
+            
+            await ImprimirPedido();
+            
+            NavigationManager.NavigateTo("/pedidos");
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Erro ao finalizar pedido.", Severity.Error);
+        }
     }
 
     private async Task ImprimirPedido()
