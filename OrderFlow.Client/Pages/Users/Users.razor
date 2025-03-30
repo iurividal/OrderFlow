@@ -1,0 +1,89 @@
+﻿@page "/admin/users"
+@inject NavigationManager NavigationManager
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Usuários</MudText>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudTextField @bind-Value="searchString" Placeholder="Buscar por produto..." Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                              Class="mt-0"></MudTextField>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudTable Items="@users" Filter="@(FilterFunc)" Hover="true" Dense="true" Bordered="true" Striped="true"
+              LoadingProgressColor="Color.Primary">
+        <HeaderContent>
+            <MudTh>Nome</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Nivel</MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Codigo">@context.FullName</MudTd>
+            <MudTd DataLabel="Produto">@context.Email</MudTd>
+            <MudTd DataLabel="Preço">@context.Role</MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                           OnClick="@(() => ViewDetails(context.Id))">
+                    Detalhes
+                </MudButton>
+
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 25, 50, 100}"/>
+        </PagerContent>
+    </MudTable>
+
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" Class="floating-button"
+            OnClick="@(() => NavigateToCreate())"/>
+</MudContainer>
+
+<style>
+    .floating-button {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 10;
+    }
+</style>
+
+@code {
+    private string searchString = "";
+    private List<UserModel> users = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // produtos = await _productService.GetProductsAsync();
+    }
+
+    private bool FilterFunc(UserModel element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.FullName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+
+    private void ViewDetails(string id)
+    {
+        NavigationManager.NavigateTo($"/admin/users/{id}");
+    }
+
+    private void NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/admin/users/create");
+    }
+
+}

@@ -10,5 +10,6 @@ public class UserEntity
     public DateTime CreatedAt { get; set; } // Data de criação
     public bool IsActive { get; set; } // Se o usuário está ativo ou não
     public int AccessLevel { get; set; } // Nível de acesso (1 para Usuário, 2 para Administrador)
+
     public AccessLevelEntity AccessLevelNavigation { get; set; } // Relacionamento com o nível de acesso
 }

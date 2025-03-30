@@ -41,7 +41,7 @@
                           Class="mb-6" />
                 
             <div class="d-flex justify-space-between align-center mb-6">
-                <MudCheckBox T="bool" @bind-Checked="userModel.RememberMe" Color="Color.Primary" Label="Lembrar-me" />
+                <MudCheckBox T="bool" @bind-Checked="_isRememberMe" Color="Color.Primary" Label="Lembrar-me" />
                 <MudLink Href="/reset-password" Underline="Underline.None">Esqueceu a senha?</MudLink>
             </div>
             
@@ -72,6 +72,7 @@
     
     // Controle de visibilidade da senha
     bool _isShowPassword = false;
+    bool _isRememberMe = false; 
     InputType _passwordInput = InputType.Password;
     string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
    

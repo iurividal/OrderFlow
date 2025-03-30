@@ -1,0 +1,119 @@
+﻿@page "/admin/users/create"
+@using System.Text;
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@* @inject AuthenticationStateProvider AuthStateProvider *@
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudPaper Elevation="3" Class="pa-4">
+        <MudText Typo="Typo.h4" Class="mb-4">Cadastro de Usuários</MudText>
+
+        <MudForm @ref="form" Model="@model" @bind-IsValid="@success">
+
+            <MudTextField @bind-Value="model.FullName" Label="Nome Completo" Class="mt-3"
+                          Required="true" RequiredError="Nome completo é obrigatório"/>
+
+            <MudTextField @bind-Value="model.Email" Label="E-mail" Class="mt-3"
+                          Required="true" RequiredError="E-mail é obrigatório"
+                          Validation="@(new EmailAddressAttribute() { ErrorMessage = "E-mail inválido" })"/>
+
+            <MudSelect @bind-Value="model.Role" Label="Nível de Acesso" Required="true" Class="mt-3"
+                       RequiredError="Nível de acesso é obrigatório">
+                @foreach (var item in accessLevels)
+                {
+                    <MudSelectItem Value="@item.Role">@item.Role</MudSelectItem>
+                }
+                
+            </MudSelect>
+
+            <MudTextField @bind-Value="model.Password" Label="Senha Gerada" Class="mt-3"
+                          ReadOnly="true" Variant="Variant.Filled"/>
+
+            <div class="d-flex align-center justify-space-between mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                           OnClick="@GerarSenha" Class="mr-2">Gerar Senha
+                </MudButton>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Success"
+                           OnClick="@Salvar" Disabled="@(!success)">Salvar
+                </MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private bool success;
+    private MudForm form;
+    private UserModel model = new();
+
+    private List<AccesslevelModel> accessLevels = new()
+    {
+        new AccesslevelModel { Id = 1, Role = "Usuário" },
+        new AccesslevelModel { Id = 2, Role = "Administrador" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Verifica se o usuário atual é admin
+        // var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+
+        // if (!user.Identity.IsAuthenticated || !user.IsInRole("Admin"))
+        // {
+        //     Snackbar.Add("Acesso negado. Apenas administradores podem acessar esta página.", Severity.Error);
+        //     NavigationManager.NavigateTo("/");
+        // }
+    }
+
+    private void GerarSenha()
+    {
+        // Gera uma senha aleatória de 10 caracteres
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        var random = new Random();
+        var senha = new StringBuilder(10);
+
+        for (int i = 0; i < 10; i++)
+        {
+            senha.Append(chars[random.Next(chars.Length)]);
+        }
+
+        model.Password = senha.ToString();
+    }
+
+    private async Task Salvar()
+    {
+        if (string.IsNullOrEmpty(model.Password))
+        {
+            Snackbar.Add("Por favor, gere uma senha antes de salvar.", Severity.Warning);
+            return;
+        }
+
+        // Aqui você implementaria a lógica para salvar o usuário no banco de dados
+        // Normalmente usando um serviço injetado como:
+        // await UserService.CreateUserAsync(model);
+
+        // Hash da senha antes de salvar (exemplo)
+        string senhaHash = HashSenha(model.Password);
+
+        // Simulação de sucesso
+        Snackbar.Add("Usuário cadastrado com sucesso!", Severity.Success);
+        model = new UserModel(); // Limpa o formulário
+        form.ResetAsync();
+    }
+
+    private string HashSenha(string senha)
+    {
+        // Exemplo simples de hash com SHA256 - em produção use uma solução mais robusta
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(senha);
+            byte[] hash = sha256.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
+        }
+    }
+
+
+}
