@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using OrderFlow.Api.Extensions;
 using OrderFlow.Api.Models;
 using OrderFlow.Shared;
 
@@ -17,11 +18,11 @@ public class UserMappingProfile : Profile
         
         // Mapear UserModel para UserEntity
         CreateMap<UserModel, UserEntity>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src=>src.Id))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-            .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
-            .ForMember(dest => dest.AccessLevelNavigation, opt => opt.MapFrom(src=>src.Role));
+            .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password.HashPassword()))
+            .ForMember(dest => dest.AccessLevel, opt => opt.MapFrom(src=>src.Role == "Administrador" ? 2 : 1));
     }
     
     

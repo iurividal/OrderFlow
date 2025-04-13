@@ -3,7 +3,16 @@ using OrderFlow.Shared;
 
 namespace OrderFlow.Client.Services;
 
-public class UserService
+public interface IUserService
+{
+    Task<List<UserModel>> GetAllUsers();
+    Task<UserModel> GetUserById(string id);
+    Task<bool> CreateUser(UserModel user);
+    
+    Task<bool> UpdateUserAsync(UserModel user);
+}
+
+public class UserService : IUserService
 {
     private readonly HttpClient _httpClient;
     private const string ENDPOINT = "/users";
@@ -16,13 +25,21 @@ public class UserService
     // Método para obter todos os usuários
     public async Task<List<UserModel>> GetAllUsers()
     {
-        var response = await _httpClient.GetAsync(ENDPOINT);
-        if (response.IsSuccessStatusCode)
+        try
         {
-            return await response.Content.ReadFromJsonAsync<List<UserModel>>();
-        }
+            var response = await _httpClient.GetAsync(ENDPOINT);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<UserModel>>();
+            }
 
-        return new List<UserModel>();
+            return new List<UserModel>();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     // Método para obter um usuário por ID
@@ -44,4 +61,12 @@ public class UserService
         var response = await _httpClient.PostAsJsonAsync(ENDPOINT, user);
         return response.IsSuccessStatusCode;
     }
+    
+    //atualizar um usuário
+    public async Task<bool> UpdateUserAsync(UserModel user)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"{ENDPOINT}/{user.Id}", user);
+        return response.IsSuccessStatusCode;
+    }
+    
 }

@@ -41,7 +41,8 @@ CREATE TABLE users (
     Email VARCHAR(255) UNIQUE NOT NULL,       -- Email único
     Password VARCHAR(255) NOT NULL,           -- Senha do usuário
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data de criação
-    IsActive BOOLEAN DEFAULT TRUE,            -- Status se o usuário está ativo ou não
+    CreatedBy VARCHAR(255),                    -- usuário que crioou
+    InactivatedAt TIMESTAMP ,            -- Status se o usuário está ativo ou não
     AccessLevel INT NOT NULL,                 -- Nível de acesso do usuário
     CONSTRAINT fk_access_level FOREIGN KEY (AccessLevel) REFERENCES access_levels(Id) -- Relacionamento com a tabela de níveis de acesso
 );

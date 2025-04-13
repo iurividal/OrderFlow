@@ -1,5 +1,7 @@
-﻿@page "/admin/users"
+﻿@page "/users"
+@using OrderFlow.Client.Services
 @inject NavigationManager NavigationManager
+@inject IUserService _userService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <MudText Typo="Typo.h4" Class="mb-4">Usuários</MudText>
@@ -20,12 +22,14 @@
             <MudTh>Nome</MudTh>
             <MudTh>Email</MudTh>
             <MudTh>Nivel</MudTh>
+            <MudTh>Status</MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Codigo">@context.FullName</MudTd>
-            <MudTd DataLabel="Produto">@context.Email</MudTd>
-            <MudTd DataLabel="Preço">@context.Role</MudTd>
+            <MudTd DataLabel="Nome">@context.FullName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Nivel">@context.Role</MudTd>
+            <MudTd DataLabel="Status">@(context.InactivatedAt != null ? "Inativo" : "Ativo")</MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
                            OnClick="@(() => ViewDetails(context.Id))">
@@ -58,7 +62,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // produtos = await _productService.GetProductsAsync();
+        users = await _userService.GetAllUsers();
     }
 
     private bool FilterFunc(UserModel element)
@@ -78,7 +82,7 @@
 
     private void ViewDetails(string id)
     {
-        NavigationManager.NavigateTo($"/admin/users/{id}");
+        NavigationManager.NavigateTo($"/user-details/{id}");
     }
 
     private void NavigateToCreate()

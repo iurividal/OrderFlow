@@ -1,0 +1,167 @@
+﻿@page "/user-details/{Id}"
+@using System.ComponentModel.DataAnnotations
+@using OrderFlow.Client.Services
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudCard Elevation="3" Class="rounded-lg">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">Detalhes do Usuário</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Default"
+                               OnClick="@(() => NavigationManager.NavigateTo("/users"))"
+                               Title="Voltar para a Lista de Usuários"/>
+            </CardHeaderActions>
+        </MudCardHeader>
+
+        <MudCardContent>
+            @if (user == null)
+            {
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="user.FullName" Label="Nome Completo"
+                                      ReadOnly="!isEditing" Variant="Variant.Outlined"
+                                      FullWidth="true" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="user.UserName" Label="Nome de Usuário"
+                                      ReadOnly="!isEditing" Variant="Variant.Outlined"
+                                      FullWidth="true" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="user.Email" Label="Email"
+                                      ReadOnly="!isEditing" Variant="Variant.Outlined"
+                                      FullWidth="true" Margin="Margin.Dense"/>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect @bind-Value="user.Role" Label="Tipo de Permissão"
+                                   ReadOnly="!isEditing" Variant="Variant.Outlined"
+                                   FullWidth="true" Margin="Margin.Dense">
+                            <MudSelectItem Value="@("Usuario")">Usuário</MudSelectItem>
+                            <MudSelectItem Value="@("Administrador")">Administrador</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSwitch @bind-Value="isActive"
+                                   Color="Color.Primary" Disabled="!isEditing">
+                            @(isActive ? "Usuário Ativo" : "Usuário Inativo")
+                        </MudSwitch>
+
+                    </MudItem>
+                </MudGrid>
+            }
+        </MudCardContent>
+
+        <MudCardActions Class="pa-4 justify-space-between">
+            <MudButton Variant="Variant.Filled"
+                       Color="@(isEditing ? Color.Error : Color.Primary)"
+                       OnClick="ToggleEditMode">
+                @(isEditing ? "Cancelar" : "Editar")
+            </MudButton>
+
+            @if (isEditing)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           OnClick="SaveChanges">
+                    Salvar Alterações
+                </MudButton>
+            }
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Parameter] public string Id { get; set; }
+    public bool boolean { get; set; } = true;
+    private UserModel user;
+    private bool isEditing = false;
+    public bool isActive { get; set; } = false;
+    private UserModel originalUser = new UserModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserData();
+    }
+
+    private async Task LoadUserData()
+    {
+        try
+        {
+            // Aqui você chamaria seu serviço para obter os detalhes do usuário
+            user = await UserService.GetUserById(Id);
+
+            if (user != null)
+            {
+                isActive = user.InactivatedAt == null;
+                // Guarda uma cópia para poder cancelar as alterações
+                originalUser = new UserModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Role = user.Role,
+                    InactivatedAt = user.InactivatedAt
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao carregar dados do usuário: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void ToggleEditMode()
+    {
+        if (isEditing)
+        {
+            // Cancelar edição - restaurar valores originais
+            user.UserName = originalUser.UserName;
+            user.Email = originalUser.Email;
+            user.FullName = originalUser.FullName;
+            user.Role = originalUser.Role;
+            user.InactivatedAt = isActive == false ? DateTime.Now : null;
+        }
+
+        isEditing = !isEditing;
+    }
+
+    private async Task SaveChanges()
+    {
+        try
+        {
+            // Aqui você chamaria seu serviço para atualizar o usuário
+            user.InactivatedAt = isActive == false ? DateTime.Now : null;
+            await UserService.UpdateUserAsync(user);
+
+            // Atualiza os valores originais
+            originalUser = new UserModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                Role = user.Role,
+                InactivatedAt = user.InactivatedAt
+            };
+
+            isActive = user.InactivatedAt == null;
+            isEditing = false;
+            Snackbar.Add("Usuário atualizado com sucesso!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao salvar as alterações: {ex.Message}", Severity.Error);
+        }
+    }
+
+}

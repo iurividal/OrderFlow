@@ -11,6 +11,8 @@ public interface IUserService
     Task<UserModel> GetUserByIdAsync(string id);
     Task<List<UserModel>> GetAllUsersAsync();
     Task<bool> CreateUserAsync(UserModel user);
+
+    Task<bool> UpdateUserAsync(UserModel user);
 }
 
 public class UseService : IUserService
@@ -38,7 +40,9 @@ public class UseService : IUserService
 
     public async Task<UserModel> GetUserByIdAsync(string id)
     {
-        var userEntity = await _userRepository.GetUserByIdAsync(id);
+        var userId = int.Parse(id);
+
+        var userEntity = await _userRepository.GetUserByIdAsync(userId);
         if (userEntity == null)
         {
             return null;
@@ -57,7 +61,31 @@ public class UseService : IUserService
 
     public async Task<bool> CreateUserAsync(UserModel user)
     {
-        var userEntity = _mapper.Map<UserEntity>(user);
-        return await _userRepository.CreateUserAsync(userEntity);
+        try
+        {
+            var userEntity = _mapper.Map<UserEntity>(user);
+            userEntity.CreatedAt = DateTime.Now;
+            return await _userRepository.CreateUserAsync(userEntity);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    // Método para atualizar um usuário existente
+    public async Task<bool> UpdateUserAsync(UserModel user)
+    {
+        try
+        {
+            var userEntity = _mapper.Map<UserEntity>(user);
+            return await _userRepository.UpdateUserAsync(userEntity);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

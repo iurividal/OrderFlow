@@ -2,8 +2,10 @@
 @using System.Text;
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Cryptography
+@using OrderFlow.Client.Services
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
+@inject IUserService UserService
 @* @inject AuthenticationStateProvider AuthStateProvider *@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
@@ -12,7 +14,10 @@
 
         <MudForm @ref="form" Model="@model" @bind-IsValid="@success">
 
-            <MudTextField @bind-Value="model.FullName" Label="Nome Completo" Class="mt-3"
+            <MudTextField @bind-Value="model.FullName" OnBlur="GerarNomeUsuario" Label="Nome Completo" Class="mt-3"
+                          Required="true" RequiredError="Nome completo é obrigatório"/>
+
+            <MudTextField @bind-Value="model.UserName" Label="Usuário" Class="mt-3"
                           Required="true" RequiredError="Nome completo é obrigatório"/>
 
             <MudTextField @bind-Value="model.Email" Label="E-mail" Class="mt-3"
@@ -25,7 +30,7 @@
                 {
                     <MudSelectItem Value="@item.Role">@item.Role</MudSelectItem>
                 }
-                
+
             </MudSelect>
 
             <MudTextField @bind-Value="model.Password" Label="Senha Gerada" Class="mt-3"
@@ -68,6 +73,26 @@
         // }
     }
 
+    //gerar o nome de usuario com primeiro e ultimo nome
+    private void GerarNomeUsuario()
+    {
+        if (string.IsNullOrEmpty(model.FullName))
+        {
+            return;
+        }
+
+        var nomeCompleto = model.FullName.Split(' ');
+
+        if (nomeCompleto.Length > 1)
+        {
+            model.UserName = $"{nomeCompleto[0].ToLower()}.{nomeCompleto[nomeCompleto.Length - 1].ToLower()}";
+        }
+        else
+        {
+            model.UserName = $"{nomeCompleto[0].ToLower()}";
+        }
+    }
+
     private void GerarSenha()
     {
         // Gera uma senha aleatória de 10 caracteres
@@ -91,28 +116,15 @@
             return;
         }
 
-        // Aqui você implementaria a lógica para salvar o usuário no banco de dados
-        // Normalmente usando um serviço injetado como:
-        // await UserService.CreateUserAsync(model);
-
-        // Hash da senha antes de salvar (exemplo)
-        string senhaHash = HashSenha(model.Password);
-
-        // Simulação de sucesso
+        await UserService.CreateUser(model);
         Snackbar.Add("Usuário cadastrado com sucesso!", Severity.Success);
-        model = new UserModel(); // Limpa o formulário
-        form.ResetAsync();
+        await ClearForm();
     }
 
-    private string HashSenha(string senha)
+    private async Task ClearForm()
     {
-        // Exemplo simples de hash com SHA256 - em produção use uma solução mais robusta
-        using (SHA256 sha256 = SHA256.Create())
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(senha);
-            byte[] hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
+        model = new UserModel();
+        await form.ResetAsync();
     }
 
 
